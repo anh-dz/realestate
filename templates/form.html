@@ -2,41 +2,281 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ 'Edit' if property else 'Add' }} Property</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f4f6f9; }
-        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { margin-top: 20px; padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; width: 100%; }
-        button:hover { background-color: #218838; }
-        a { display: block; text-align: center; margin-top: 10px; color: #666; }
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        .form-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .form-header h1 { font-size: 1.8rem; margin: 0; color: var(--text-main); }
+        .form-icon { font-size: 2rem; }
+        
+        .form-section-title {
+            font-size: 0.85em;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+            margin-top: 30px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+        
+        .form-row { display: flex; gap: 25px; margin-bottom: 20px; }
+        .form-col { flex: 1; }
+        
+        .form-group { margin-bottom: 5px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            font-size: 0.9em; 
+            color: var(--text-main); 
+        }
+        .form-group input, .form-group select { 
+            width: 100%; 
+            box-sizing: border-box; 
+            padding: 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-actions { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 50px; 
+            padding-top: 25px; 
+            border-top: 1px solid var(--border); 
+        }
+        
+        /* Updated Checkbox styling for vertical alignment */
+        .checkbox-wrapper { 
+            display: flex; 
+            flex-direction: column; /* Stack label and input vertically */
+            gap: 8px; 
+            margin-bottom: 5px;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            padding: 12px; /* Match input padding */
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            height: 50px; /* Match approximate input height */
+            box-sizing: border-box;
+        }
+
+        .checkbox-container input { 
+            width: 18px; 
+            height: 18px; 
+            margin: 0 10px 0 0; 
+            cursor: pointer; 
+            accent-color: var(--primary); 
+        }
+        
+        .checkbox-container span {
+            font-size: 1em;
+            color: var(--text-main);
+        }
     </style>
 </head>
 <body>
-    <h1>{{ 'Edit Property' if property else 'Add New Property' }}</h1>
-    
-    <form method="POST">
-        <label>District</label>
-        <select name="district_id" required>
-            {% for d in districts %}
-            <option value="{{ d['district_id'] }}" {% if property and property['district_id'] == d['district_id'] %}selected{% endif %}>
-                {{ d['district_name'] }}
-            </option>
-            {% endfor %}
-        </select>
 
-        <label>Address</label>
-        <input type="text" name="address" value="{{ property['address'] if property else '' }}" required>
+    <div class="container">
+        <a href="/" class="btn-back"><span>←</span> Back to List</a>
 
-        <label>Price per Sqm</label>
-        <input type="number" name="price_per_sqm" value="{{ property['price_per_sqm'] if property else '' }}" required>
+        <div class="form-card">
+            <div class="form-header">
+                <span class="form-icon">{{ '✏️' if property else '✨' }}</span>
+                <h1>{{ 'Edit Property Details' if property else 'Add New Property' }}</h1>
+            </div>
 
-        <label>Completion Date</label>
-        <input type="date" name="completion_date" value="{{ property['completion_date'] if property else '' }}" required>
+            <form method="POST">
+                
+                <!-- 1. LOCATION & BASIC INFO -->
+                <div class="form-section-title" style="margin-top: 0;">1. Location & Info</div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>District *</label>
+                            <select name="district_id" required>
+                                {% for d in districts %}
+                                <option value="{{ d['district_id'] }}" 
+                                    {% if property and property['district_id'] == d['district_id'] %}selected{% endif %}>
+                                    {{ d['district_name'] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col" style="flex: 2;">
+                        <div class="form-group">
+                            <label>Address *</label>
+                            <input type="text" name="address" value="{{ property['address'] if property else '' }}" required placeholder="e.g. No. 123, Sec 1, Xinyi Rd">
+                        </div>
+                    </div>
+                </div>
 
-        <button type="submit">Save</button>
-        <a href="{{ url_for('index') }}">Cancel</a>
-    </form>
+                <!-- 2. BUILDING DETAILS -->
+                <div class="form-section-title">2. Building Specs</div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Building Type *</label>
+                            <select name="building_type" required>
+                                <option value="" disabled selected>Select Type</option>
+                                {% for b in building_types %}
+                                <option value="{{ b['building_type'] }}"
+                                    {% if property and property['building_type'] == b['building_type'] %}selected{% endif %}>
+                                    {{ b['building_type'] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Material (Select)</label>
+                            {% if materials %}
+                            <select name="building_materials">
+                                <option value="">None / Unknown</option>
+                                {% for m in materials %}
+                                <option value="{{ m['building_materials'] }}"
+                                    {% if property and property['building_materials'] == m['building_materials'] %}selected{% endif %}>
+                                    {{ m['building_materials'] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <input type="text" name="building_materials" value="{{ property['building_materials'] if property else '' }}">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Total Floors</label>
+                            <input type="number" name="floor_count" value="{{ property['floor_count'] if property else '' }}" placeholder="e.g. 12">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. LAYOUT (ENGLISH) -->
+                <div class="form-section-title">3. Layout Configuration</div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Rooms</label>
+                            <input type="number" name="room_count" value="{{ property['room_count'] if property else 0 }}" min="0">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Halls</label>
+                            <input type="number" name="hall_count" value="{{ property['hall_count'] if property else 0 }}" min="0">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Bathrooms</label>
+                            <input type="number" name="bathroom_count" value="{{ property['bathroom_count'] if property else 0 }}" min="0">
+                        </div>
+                    </div>
+                    
+                    <!-- Balcony field updated to match other fields (Label top, Input bottom) -->
+                    <div class="form-col form-group">
+                        <label>Has Balcony?</label> <!-- Label ở trên -->
+                        <div class="checkbox-container"> <!-- Input ở dưới trong khung -->
+                            <input type="checkbox" name="balcony" id="balcony" {% if property and property['balcony'] %}checked{% endif %}>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. PARKING -->
+                <div class="form-section-title">4. Parking Facilities</div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Parking Type (Select)</label>
+                            {% if parking_types %}
+                            <select name="parking_type">
+                                <option value="">No Parking</option>
+                                {% for p in parking_types %}
+                                <option value="{{ p['parking_type'] }}"
+                                    {% if property and property['parking_type'] == p['parking_type'] %}selected{% endif %}>
+                                    {{ p['parking_type'] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <input type="text" name="parking_type" value="{{ property['parking_type'] if property and property['parking_type'] != 'nan' else '' }}">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Parking Price (TWD)</label>
+                            <input type="number" name="parking_price" value="{{ property['parking_price'] if property else 0 }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. FINANCIALS -->
+                <div class="form-section-title">5. Financials</div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Price per m² (TWD) *</label>
+                            <input type="number" name="price_per_sqm" value="{{ property['price_per_sqm'] if property else '' }}" required placeholder="e.g. 850000">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Transaction Date</label>
+                            <input type="date" name="transaction_date" value="{{ property['transaction_date'] if property else '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-submit" style="background-color: #28a745; width: auto; flex: 2; font-weight: 600;">
+                        {{ 'Save Changes' if property else 'Create Property' }}
+                    </button>
+                    <a href="/" class="btn btn-reset" style="text-align: center; width: auto; flex: 1;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>

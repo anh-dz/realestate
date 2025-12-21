@@ -5,8 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taipei Real Estate Analytics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Thêm font Inter từ Google Fonts để đẹp hơn -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .parking-badge { font-size: 0.85em; color: #059669; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; }
+        .mat-badge { font-size: 0.85em; color: #4b5563; font-style: italic; }
+        .layout-badge { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 0.85em; 
+            color: #4b5563; 
+            background: #f3f4f6; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .action-cell { display: flex; gap: 4px; }
+        .action-btn { width: 28px; height: 28px; font-size: 1em; display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; transition: 0.2s; border-radius: 4px; text-decoration: none; }
+        .action-btn:hover { background-color: #f3f4f6; }
+        .btn-delete { color: #dc3545; }
+        .btn-delete:hover { background-color: #ffe6e6; }
+        .btn-edit { color: #2563eb; }
+        .btn-edit:hover { background-color: #dbeafe; }
+    </style>
 </head>
 <body>
 
@@ -17,9 +37,10 @@
                 <h1>Taipei Real Estate Analytics</h1>
                 <span class="record-count">Found <strong>{{ "{:,.0f}".format(total_count) }}</strong> properties available</span>
             </div>
-            <a href="{{ url_for('suggest') }}" class="btn btn-suggest">
-                <span>💰</span> Affordability Calculator
-            </a>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ url_for('add') }}" class="btn btn-filter" style="background-color: #28a745;">+ Add New</a>
+                <a href="{{ url_for('suggest') }}" class="btn btn-suggest"><span>💰</span> Calculator</a>
+            </div>
         </div>
 
         <!-- FILTER BAR -->
@@ -30,27 +51,60 @@
                 <select name="district">
                     <option value="">All Districts</option>
                     {% for d in districts %}
-                    <option value="{{ d['district_id'] }}" {% if selected_district|int == d['district_id'] %}selected{% endif %}>
-                        {{ d['district_name'] }}
-                    </option>
+                    <option value="{{ d['district_id'] }}" {% if selected_district|int == d['district_id'] %}selected{% endif %}>{{ d['district_name'] }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <!-- Building Type -->
             <div class="filter-group">
-                <label>Building Type</label>
+                <label>Type</label>
                 <select name="building_type">
                     <option value="">All Types</option>
                     {% for b in building_types %}
-                    <option value="{{ b['building_type'] }}" {% if selected_type == b['building_type'] %}selected{% endif %}>
-                        {{ b['building_type'] }}
+                    <option value="{{ b['building_type'] }}" {% if selected_type == b['building_type'] %}selected{% endif %}>{{ b['building_type'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Material -->
+            <div class="filter-group">
+                <label>Material</label>
+                <select name="material" style="min-width: 130px;">
+                    <option value="">All Materials</option>
+                    {% for m in materials %}
+                    <option value="{{ m['building_materials'] }}" {% if selected_material == m['building_materials'] %}selected{% endif %}>
+                        {{ m['building_materials'] }}
                     </option>
                     {% endfor %}
                 </select>
             </div>
 
-            <!-- Price Range -->
+            <!-- Parking -->
+            <div class="filter-group">
+                <label>Parking</label>
+                <select name="parking" style="min-width: 130px;">
+                    <option value="">All Options</option>
+                    <option value="None" {% if selected_parking == 'None' %}selected{% endif %}>No Parking</option>
+                    {% for p in parking_types %}
+                    <option value="{{ p['parking_type'] }}" {% if selected_parking == p['parking_type'] %}selected{% endif %}>
+                        {{ p['parking_type'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Balcony -->
+            <div class="filter-group">
+                <label>Balcony</label>
+                <select name="balcony" style="min-width: 100px;">
+                    <option value="">All</option>
+                    <option value="yes" {% if selected_balcony == 'yes' %}selected{% endif %}>Yes</option>
+                    <option value="no" {% if selected_balcony == 'no' %}selected{% endif %}>No</option>
+                </select>
+            </div>
+
+            <!-- Price -->
             <div class="filter-group">
                 <label>Price Range (per m²)</label>
                 <div class="price-inputs">
@@ -60,8 +114,7 @@
                 </div>
             </div>
 
-            <!-- Buttons -->
-            <button type="submit" class="btn btn-filter">Apply Filters</button>
+            <button type="submit" class="btn btn-filter">Apply</button>
             <a href="/" class="btn btn-reset">Reset</a>
         </form>
 
@@ -71,65 +124,21 @@
                 <table>
                     <thead>
                         <tr>
-                            <!-- ID -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='id', order='desc' if sort_by=='id' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}" 
-                                   class="{{ 'active' if sort_by == 'id' else '' }}">
-                                    ID {% if sort_by == 'id' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
-                            
-                            <!-- District -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='district', order='desc' if sort_by=='district' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
-                                   class="{{ 'active' if sort_by == 'district' else '' }}">
-                                    District {% if sort_by == 'district' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
-
+                            <th><a href="{{ url_for('index', sort_by='id', order='desc' if sort_by=='id' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony, min_price=min_price, max_price=max_price) }}" class="{{ 'active' if sort_by == 'id' else '' }}">ID {% if sort_by == 'id' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='district', order='desc' if sort_by=='district' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'district' else '' }}">District {% if sort_by == 'district' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
                             <th>Address</th>
-
-                            <!-- Type -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='type', order='desc' if sort_by=='type' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
-                                   class="{{ 'active' if sort_by == 'type' else '' }}">
-                                    Type {% if sort_by == 'type' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
-
-                            <!-- Floor -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='floor', order='desc' if sort_by=='floor' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
-                                   class="{{ 'active' if sort_by == 'floor' else '' }}">
-                                    Floor {% if sort_by == 'floor' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
                             
-                            <th>Nearby Amenities</th>
+                            <!-- CỘT LAYOUT (TIẾNG ANH) -->
+                            <th>Layout</th>
 
-                            <!-- Price/m2 -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='price', order='desc' if sort_by=='price' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
-                                   class="{{ 'active' if sort_by == 'price' else '' }}">
-                                    Price/m² {% if sort_by == 'price' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
-
-                            <!-- Total Price -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='total', order='desc' if sort_by=='total' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
-                                   class="{{ 'active' if sort_by == 'total' else '' }}">
-                                    Total Price {% if sort_by == 'total' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
-
-                            <!-- Date -->
-                            <th>
-                                <a href="{{ url_for('index', sort_by='date', order='desc' if sort_by=='date' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
-                                   class="{{ 'active' if sort_by == 'date' else '' }}">
-                                    Date {% if sort_by == 'date' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
-                                </a>
-                            </th>
+                            <th><a href="{{ url_for('index', sort_by='type', order='desc' if sort_by=='type' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'type' else '' }}">Type {% if sort_by == 'type' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='material', order='desc' if sort_by=='material' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'material' else '' }}">Material {% if sort_by == 'material' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='floor', order='desc' if sort_by=='floor' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'floor' else '' }}">Floor {% if sort_by == 'floor' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='parking', order='desc' if sort_by=='parking' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'parking' else '' }}">Parking {% if sort_by == 'parking' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='price', order='desc' if sort_by=='price' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'price' else '' }}">Price/m² {% if sort_by == 'price' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='total', order='desc' if sort_by=='total' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'total' else '' }}">Total Price {% if sort_by == 'total' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th><a href="{{ url_for('index', sort_by='date', order='desc' if sort_by=='date' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony) }}" class="{{ 'active' if sort_by == 'date' else '' }}">Date {% if sort_by == 'date' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}</a></th>
+                            <th>Act</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -139,33 +148,41 @@
                                 <td class="col-id">#{{ prop['property_id'] }}</td>
                                 <td>{{ prop['district_name'] }}</td>
                                 <td class="address-cell" title="{{ prop['address'] }}">{{ prop['address'] }}</td>
-                                <td>{{ prop['building_type'] }}</td>
-                                <td>
-                                    {{ prop['floor_count'] }}F
-                                    {% if prop['balcony'] %}<span title="Has Balcony" style="cursor:help"> 🌤</span>{% endif %}
-                                </td>
                                 
-                                <!-- New Amenities Badges -->
+                                <!-- Layout hiển thị Tiếng Anh -->
                                 <td>
-                                    <span class="amenity-badge mrt {{ 'active' if prop['mrt_station_500m'] else '' }}">🚇 MRT</span>
-                                    <span class="amenity-badge school {{ 'active' if prop['school_500m'] else '' }}">🎓 School</span>
-                                    <span class="amenity-badge park {{ 'active' if prop['park_500m'] else '' }}">🌳 Park</span>
+                                    <span class="layout-badge">
+                                        {{ prop['room_count'] }} Rooms, {{ prop['hall_count'] }} Halls, {{ prop['bathroom_count'] }} Baths
+                                    </span>
+                                </td>
+
+                                <td>{{ prop['building_type'] }}</td>
+                                <td class="mat-badge">{{ prop['building_materials'] }}</td>
+                                
+                                <td>{{ prop['floor_count'] }}F {% if prop['balcony'] %}<span title="Has Balcony" style="cursor:help">🌤</span>{% endif %}</td>
+                                
+                                <td>
+                                    {% if prop['parking_type'] and prop['parking_type'] != 'nan' %}
+                                        <span class="parking-badge">{{ prop['parking_type'] }}</span>
+                                    {% else %}
+                                        <span style="color:#e5e7eb">-</span>
+                                    {% endif %}
                                 </td>
 
                                 <td>{{ "{:,.0f}".format(prop['price_per_sqm']) }}</td>
-                                <td class="col-price">
-                                    {{ "{:,.0f}".format(prop['price'] / 10000) }} <small style="color:#666; font-weight:400">万</small>
-                                </td>
+                                <td class="col-price">{{ "{:,.0f}".format(prop['price'] / 10000) }} <small style="color:#666; font-weight:400">万</small></td>
                                 <td style="color:var(--text-muted); font-size:0.9em">{{ prop['transaction_date'] }}</td>
+                                
+                                <td class="action-cell">
+                                    <a href="{{ url_for('edit', id=prop['property_id']) }}" class="action-btn btn-edit" title="Edit">✏️</a>
+                                    <form action="{{ url_for('delete', id=prop['property_id']) }}" method="POST" onsubmit="return confirm('Delete ID #{{ prop['property_id'] }}?');" style="margin: 0;">
+                                        <button type="submit" class="action-btn btn-delete" title="Delete">🗑</button>
+                                    </form>
+                                </td>
                             </tr>
                             {% endfor %}
                         {% else %}
-                            <tr>
-                                <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                                    <div style="font-size: 2em; margin-bottom: 10px;">🔍</div>
-                                    No properties found matching your criteria.
-                                </td>
-                            </tr>
+                            <tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--text-muted);">No properties found matching your criteria.</td></tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -175,37 +192,25 @@
         <!-- PAGINATION -->
         <div class="pagination-container">
             <div class="pagination-pages">
-                <!-- Previous Button -->
-                {% if page > 1 %}
-                <a href="{{ url_for('index', page=page-1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">←</a>
-                {% else %}
-                <span class="btn-page" style="opacity: 0.5; cursor: not-allowed;">←</span>
-                {% endif %}
-
-                <!-- Pages Loop -->
+                {% if page > 1 %}<a href="{{ url_for('index', page=page-1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">←</a>{% endif %}
+                
                 {% for p in page_range %}
                     {% if p == '...' %}
                         <span class="dots">...</span>
                     {% else %}
-                        <a href="{{ url_for('index', page=p, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" 
-                           class="btn-page {{ 'active' if p == page else '' }}">
-                           {{ p }}
-                        </a>
+                        <a href="{{ url_for('index', page=p, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page {{ 'active' if p == page else '' }}">{{ p }}</a>
                     {% endif %}
                 {% endfor %}
 
-                <!-- Next Button -->
-                {% if page < total_pages %}
-                <a href="{{ url_for('index', page=page+1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">→</a>
-                {% else %}
-                <span class="btn-page" style="opacity: 0.5; cursor: not-allowed;">→</span>
-                {% endif %}
+                {% if page < total_pages %}<a href="{{ url_for('index', page=page+1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">→</a>{% endif %}
             </div>
-
-            <!-- Quick Jump -->
+            
             <form action="/" method="GET" class="quick-jump">
                 <input type="hidden" name="district" value="{{ selected_district or '' }}">
                 <input type="hidden" name="building_type" value="{{ selected_type or '' }}">
+                <input type="hidden" name="material" value="{{ selected_material or '' }}">
+                <input type="hidden" name="parking" value="{{ selected_parking or '' }}">
+                <input type="hidden" name="balcony" value="{{ selected_balcony or '' }}">
                 <input type="hidden" name="min_price" value="{{ min_price or '' }}">
                 <input type="hidden" name="max_price" value="{{ max_price or '' }}">
                 <input type="hidden" name="sort_by" value="{{ sort_by }}">
@@ -217,6 +222,5 @@
             </form>
         </div>
     </div>
-
 </body>
 </html>
