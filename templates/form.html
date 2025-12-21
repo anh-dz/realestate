@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ 'Edit' if property else 'Add' }} Property</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f4f6f9; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; width: 100%; }
+        button:hover { background-color: #218838; }
+        a { display: block; text-align: center; margin-top: 10px; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>{{ 'Edit Property' if property else 'Add New Property' }}</h1>
+    
+    <form method="POST">
+        <label>District</label>
+        <select name="district_id" required>
+            {% for d in districts %}
+            <option value="{{ d['district_id'] }}" {% if property and property['district_id'] == d['district_id'] %}selected{% endif %}>
+                {{ d['district_name'] }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <label>Address</label>
+        <input type="text" name="address" value="{{ property['address'] if property else '' }}" required>
+
+        <label>Price per Sqm</label>
+        <input type="number" name="price_per_sqm" value="{{ property['price_per_sqm'] if property else '' }}" required>
+
+        <label>Completion Date</label>
+        <input type="date" name="completion_date" value="{{ property['completion_date'] if property else '' }}" required>
+
+        <button type="submit">Save</button>
+        <a href="{{ url_for('index') }}">Cancel</a>
+    </form>
+</body>
+</html>

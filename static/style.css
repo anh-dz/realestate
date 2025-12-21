@@ -1,0 +1,320 @@
+:root {
+    --primary: #2563eb;      /* Xanh dương hiện đại */
+    --primary-hover: #1d4ed8;
+    --bg-body: #f1f5f9;      /* Xám rất nhạt */
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --accent-price: #db2777; /* Hồng đậm cho giá */
+}
+
+/* --- RESET & BASE --- */
+body { 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+    padding: 20px; 
+    background-color: var(--bg-body); 
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.5;
+}
+
+h1 { 
+    color: var(--text-main); 
+    font-weight: 700; 
+    margin: 0; 
+    font-size: 1.8rem;
+    letter-spacing: -0.025em;
+}
+
+a { text-decoration: none; color: inherit; transition: color 0.2s; }
+
+/* --- LAYOUT UTILS --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- HEADER AREA --- */
+.header-container {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-end;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.record-count { 
+    font-size: 0.9em; 
+    color: var(--text-muted); 
+    display: block; 
+    margin-top: 5px;
+}
+
+/* --- BUTTONS --- */
+.btn { 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    font-weight: 500; 
+    font-size: 0.95em; 
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    gap: 8px;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.btn:active { transform: translateY(0); }
+
+.btn-filter { background-color: var(--primary); color: white; }
+.btn-filter:hover { background-color: var(--primary-hover); }
+
+.btn-reset { 
+    background-color: white; 
+    color: var(--text-muted); 
+    border-color: var(--border); 
+}
+.btn-reset:hover { background-color: #f8fafc; color: var(--text-main); }
+
+.btn-suggest { 
+    background-color: #7c3aed; /* Tím */
+    color: white; 
+    box-shadow: var(--shadow-md);
+}
+.btn-suggest:hover { background-color: #6d28d9; }
+
+.btn-submit { background-color: var(--primary); color: white; width: 100%; font-size: 1.1em; }
+
+/* --- BACK BUTTON (NEW) --- */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Khoảng cách giữa mũi tên và chữ */
+    padding: 10px 24px;
+    background-color: white;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: 50px; /* Bo tròn hoàn toàn */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-back:hover {
+    background-color: #fff;
+    color: #007bff;
+    border-color: #007bff;
+    transform: translateX(-5px); /* Hiệu ứng trượt sang trái */
+    box-shadow: 0 4px 8px rgba(0,123,255,0.15);
+}
+
+/* --- FILTER BAR --- */
+.filter-bar {
+    background-color: var(--bg-card); 
+    padding: 20px; 
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm); 
+    margin-bottom: 25px;
+    border: 1px solid var(--border);
+    display: flex; 
+    gap: 15px; 
+    align-items: flex-end; /* Căn đáy để nút và input thẳng hàng */
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-group label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+select, input { 
+    padding: 10px 12px; 
+    border: 1px solid var(--border); 
+    border-radius: 8px; 
+    outline: none;
+    font-size: 0.95em;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-width: 150px; /* Đây là nguyên nhân gây lỗi, nhưng ta sẽ override ở dưới */
+    box-sizing: border-box;
+}
+select:focus, input:focus { 
+    border-color: var(--primary); 
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+}
+
+/* Price Range Styling */
+.price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.price-inputs input { width: 110px; min-width: auto; text-align: right; }
+.price-separator { color: var(--text-muted); font-weight: bold; }
+
+/* --- DATA TABLE --- */
+.table-wrapper {
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    overflow: hidden; /* Để bo góc table */
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 1000px; 
+}
+
+th, td { 
+    padding: 16px 20px; 
+    text-align: left; 
+    border-bottom: 1px solid var(--border); 
+}
+
+th { 
+    background-color: #f8fafc; 
+    color: var(--text-muted); 
+    font-weight: 600; 
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+th a { 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    color: var(--text-muted);
+}
+th a:hover, th a.active { color: var(--primary); }
+
+tr:last-child td { border-bottom: none; }
+tr:hover { background-color: #f8fafc; }
+
+/* Table Columns Styling */
+.col-id { color: var(--text-muted); font-family: monospace; }
+.col-price { font-weight: 700; color: var(--accent-price); font-size: 1.05em; }
+.address-cell { 
+    font-size: 0.95em; 
+    color: var(--text-main); 
+    max-width: 250px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+/* Badges for Amenities */
+.amenity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 600;
+    margin-right: 4px;
+    background-color: #f1f5f9;
+    color: #94a3b8; /* Mặc định là xám (ẩn) */
+    opacity: 0.5;
+}
+
+.amenity-badge.active {
+    opacity: 1;
+}
+
+.amenity-badge.mrt.active { background-color: #dbeafe; color: #1e40af; } /* Xanh dương */
+.amenity-badge.school.active { background-color: #fce7f3; color: #9d174d; } /* Hồng */
+.amenity-badge.park.active { background-color: #dcfce7; color: #166534; } /* Xanh lá */
+
+/* Status Labels */
+.safe { color: #28a745; font-weight: bold; background: #e6f9e9; padding: 2px 6px; border-radius: 4px; } 
+.warning { color: #ffc107; font-weight: bold; background: #fff8e1; padding: 2px 6px; border-radius: 4px; } 
+.danger { color: #dc3545; font-weight: bold; background: #ffebee; padding: 2px 6px; border-radius: 4px; }
+
+/* --- PAGINATION --- */
+.pagination-container {
+    margin-top: 30px; 
+    margin-bottom: 60px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 20px;
+}
+.pagination-pages { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+
+.btn-page {
+    display: inline-flex; justify-content: center; align-items: center;
+    width: 40px; height: 40px; 
+    border: 1px solid var(--border); 
+    background-color: white;
+    color: var(--text-main); 
+    border-radius: 8px; 
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+.btn-page:hover { border-color: var(--primary); color: var(--primary); }
+.btn-page.active { 
+    background-color: var(--primary); 
+    color: white; 
+    border-color: var(--primary); 
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+.quick-jump { 
+    display: flex; align-items: center; gap: 10px; 
+    background: white; padding: 5px 10px; border-radius: 50px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.9em;
+}
+
+.quick-jump input { 
+    border: none; 
+    background: transparent; 
+    padding: 5px; 
+    width: 50px;       /* FIX: Đặt chiều rộng nhỏ cho ô nhập số trang */
+    min-width: 0;      /* FIX: Ghi đè min-width 150px từ global rule */
+    text-align: center; 
+    font-weight: bold; 
+}
+
+.quick-jump input:focus { box-shadow: none; border: none; } /* Xóa viền focus mặc định */
+
+.btn-go { 
+    background: var(--text-main); color: white; 
+    border: none; border-radius: 20px; 
+    padding: 6px 15px; font-size: 0.85em; cursor: pointer; 
+}
+.btn-go:hover { background: black; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .header-container { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .filter-bar { flex-direction: column; align-items: stretch; }
+    .price-inputs { width: 100%; }
+    .price-inputs input { flex: 1; }
+}

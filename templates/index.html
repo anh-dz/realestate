@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taipei Real Estate Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Thêm font Inter từ Google Fonts để đẹp hơn -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header-container">
+            <div>
+                <h1>Taipei Real Estate Analytics</h1>
+                <span class="record-count">Found <strong>{{ "{:,.0f}".format(total_count) }}</strong> properties available</span>
+            </div>
+            <a href="{{ url_for('suggest') }}" class="btn btn-suggest">
+                <span>💰</span> Affordability Calculator
+            </a>
+        </div>
+
+        <!-- FILTER BAR -->
+        <form action="/" method="GET" class="filter-bar">
+            <!-- District -->
+            <div class="filter-group">
+                <label>District</label>
+                <select name="district">
+                    <option value="">All Districts</option>
+                    {% for d in districts %}
+                    <option value="{{ d['district_id'] }}" {% if selected_district|int == d['district_id'] %}selected{% endif %}>
+                        {{ d['district_name'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Building Type -->
+            <div class="filter-group">
+                <label>Building Type</label>
+                <select name="building_type">
+                    <option value="">All Types</option>
+                    {% for b in building_types %}
+                    <option value="{{ b['building_type'] }}" {% if selected_type == b['building_type'] %}selected{% endif %}>
+                        {{ b['building_type'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-group">
+                <label>Price Range (per m²)</label>
+                <div class="price-inputs">
+                    <input type="number" name="min_price" placeholder="Min" value="{{ min_price if min_price }}">
+                    <span class="price-separator">-</span>
+                    <input type="number" name="max_price" placeholder="Max" value="{{ max_price if max_price }}">
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn btn-filter">Apply Filters</button>
+            <a href="/" class="btn btn-reset">Reset</a>
+        </form>
+
+        <!-- DATA TABLE -->
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <!-- ID -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='id', order='desc' if sort_by=='id' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}" 
+                                   class="{{ 'active' if sort_by == 'id' else '' }}">
+                                    ID {% if sort_by == 'id' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+                            
+                            <!-- District -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='district', order='desc' if sort_by=='district' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
+                                   class="{{ 'active' if sort_by == 'district' else '' }}">
+                                    District {% if sort_by == 'district' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+
+                            <th>Address</th>
+
+                            <!-- Type -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='type', order='desc' if sort_by=='type' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
+                                   class="{{ 'active' if sort_by == 'type' else '' }}">
+                                    Type {% if sort_by == 'type' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+
+                            <!-- Floor -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='floor', order='desc' if sort_by=='floor' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
+                                   class="{{ 'active' if sort_by == 'floor' else '' }}">
+                                    Floor {% if sort_by == 'floor' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+                            
+                            <th>Nearby Amenities</th>
+
+                            <!-- Price/m2 -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='price', order='desc' if sort_by=='price' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
+                                   class="{{ 'active' if sort_by == 'price' else '' }}">
+                                    Price/m² {% if sort_by == 'price' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+
+                            <!-- Total Price -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='total', order='desc' if sort_by=='total' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
+                                   class="{{ 'active' if sort_by == 'total' else '' }}">
+                                    Total Price {% if sort_by == 'total' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+
+                            <!-- Date -->
+                            <th>
+                                <a href="{{ url_for('index', sort_by='date', order='desc' if sort_by=='date' and order=='asc' else 'asc', page=1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price) }}"
+                                   class="{{ 'active' if sort_by == 'date' else '' }}">
+                                    Date {% if sort_by == 'date' %}{{ '▲' if order == 'asc' else '▼' }}{% endif %}
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if properties %}
+                            {% for prop in properties %}
+                            <tr>
+                                <td class="col-id">#{{ prop['property_id'] }}</td>
+                                <td>{{ prop['district_name'] }}</td>
+                                <td class="address-cell" title="{{ prop['address'] }}">{{ prop['address'] }}</td>
+                                <td>{{ prop['building_type'] }}</td>
+                                <td>
+                                    {{ prop['floor_count'] }}F
+                                    {% if prop['balcony'] %}<span title="Has Balcony" style="cursor:help"> 🌤</span>{% endif %}
+                                </td>
+                                
+                                <!-- New Amenities Badges -->
+                                <td>
+                                    <span class="amenity-badge mrt {{ 'active' if prop['mrt_station_500m'] else '' }}">🚇 MRT</span>
+                                    <span class="amenity-badge school {{ 'active' if prop['school_500m'] else '' }}">🎓 School</span>
+                                    <span class="amenity-badge park {{ 'active' if prop['park_500m'] else '' }}">🌳 Park</span>
+                                </td>
+
+                                <td>{{ "{:,.0f}".format(prop['price_per_sqm']) }}</td>
+                                <td class="col-price">
+                                    {{ "{:,.0f}".format(prop['price'] / 10000) }} <small style="color:#666; font-weight:400">万</small>
+                                </td>
+                                <td style="color:var(--text-muted); font-size:0.9em">{{ prop['transaction_date'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                    <div style="font-size: 2em; margin-bottom: 10px;">🔍</div>
+                                    No properties found matching your criteria.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination-container">
+            <div class="pagination-pages">
+                <!-- Previous Button -->
+                {% if page > 1 %}
+                <a href="{{ url_for('index', page=page-1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">←</a>
+                {% else %}
+                <span class="btn-page" style="opacity: 0.5; cursor: not-allowed;">←</span>
+                {% endif %}
+
+                <!-- Pages Loop -->
+                {% for p in page_range %}
+                    {% if p == '...' %}
+                        <span class="dots">...</span>
+                    {% else %}
+                        <a href="{{ url_for('index', page=p, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" 
+                           class="btn-page {{ 'active' if p == page else '' }}">
+                           {{ p }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Button -->
+                {% if page < total_pages %}
+                <a href="{{ url_for('index', page=page+1, district=selected_district, building_type=selected_type, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">→</a>
+                {% else %}
+                <span class="btn-page" style="opacity: 0.5; cursor: not-allowed;">→</span>
+                {% endif %}
+            </div>
+
+            <!-- Quick Jump -->
+            <form action="/" method="GET" class="quick-jump">
+                <input type="hidden" name="district" value="{{ selected_district or '' }}">
+                <input type="hidden" name="building_type" value="{{ selected_type or '' }}">
+                <input type="hidden" name="min_price" value="{{ min_price or '' }}">
+                <input type="hidden" name="max_price" value="{{ max_price or '' }}">
+                <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                <input type="hidden" name="order" value="{{ order }}">
+                
+                <span style="font-size:0.85em; margin-left: 5px;">Go to page</span>
+                <input type="number" name="page" min="1" max="{{ total_pages }}" placeholder="#" required>
+                <button type="submit" class="btn-go">Go</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
