@@ -1,0 +1,45 @@
+.calculator-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+.no-result {
+  text-align: center;
+  padding: 50px;
+  color: var(--text-muted);
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px dashed var(--border);
+}
+
+.input-group {
+  padding: 20px;
+}
+
+.input-item {
+  padding: 5px;
+}

@@ -4,70 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mortgage Calculator & Suggestions</title>
-    <!-- Link tới cùng file CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Font -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='suggest.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS riêng cho trang này để căn chỉnh form đẹp hơn */
-        .calculator-card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
-            margin-bottom: 40px;
-        }
-        
-        .section-title {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            margin-top: 40px;
-        }
-
-        .no-result {
-            text-align: center;
-            padding: 50px;
-            color: var(--text-muted);
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px dashed var(--border);
-        }
-    </style>
 </head>
 <body>
 
     <div class="container">
         <!-- HEADER -->
-        <div style="margin-bottom: 30px;">
-            <a href="/" class="btn-back">
-                <span>←</span> Back to Home
-            </a>
-            <h1 style="font-size: 2rem;">🧮 Affordability Calculator</h1>
-            <p style="color: var(--text-muted); margin-top: 5px;">
-                Calculate your estimated monthly payment and find properties that fit your financial health.
-            </p>
+        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <a href="/" class="btn-back"><span>←</span> Back to Home</a>
+                <h1 style="font-size: 2rem;">🧮 Affordability Calculator</h1>
+                <p style="color: var(--text-muted); margin-top: 5px;">
+                    Calculate your estimated monthly payment and find properties that fit your financial health.
+                </p>
+            </div>
+            
+            <!-- Dark Mode Toggle Button -->
+            <button id="theme-toggle" class="btn btn-theme" title="Toggle Dark Mode">🌙</button>
         </div>
         
         <!-- CALCULATOR FORM -->
         <div class="calculator-card">
             <form method="POST">
-                
-                <!-- Section 1: Income & Budget -->
+                <!-- Section 1 -->
                 <div class="section-title">1. Your Financials</div>
                 <div class="input-group">
                     <div class="input-item">
@@ -80,7 +41,7 @@
                     </div>
                 </div>
 
-                <!-- Section 2: Property & Loan Preferences -->
+                <!-- Section 2 -->
                 <div class="section-title" style="margin-top: 20px;">2. Loan & Property Preferences</div>
                 <div class="input-group">
                     <div class="input-item">
@@ -106,13 +67,19 @@
         <!-- RESULTS SECTION -->
         {% if suggestions %}
             <div class="result-header">
-                <h2>📊 Analysis Results</h2>
-                <span class="record-count">Found <strong>{{ suggestions|length }}</strong> suitable properties</span>
+                <div>
+                    <h2>📊 Analysis Results</h2>
+                    <span class="record-count">Found <strong>{{ suggestions|length }}</strong> suitable properties</span>
+                </div>
+                <!-- Export CSV Button (New) -->
+                <button onclick="exportTableToCSV('suggestion_results.csv')" class="btn btn-filter" style="background-color: #10b981;">
+                    📥 Export CSV
+                </button>
             </div>
             
             <div class="table-wrapper">
                 <div class="table-container">
-                    <table>
+                    <table id="resultTable">
                         <thead>
                             <tr>
                                 <th>Location</th>
@@ -135,25 +102,13 @@
                                 <td>{{ "{:,.0f}".format(prop['total_price']) }} <small>TWD</small></td>
                                 <td class="col-price">{{ "{:,.0f}".format(prop['monthly_payment']) }} <small>TWD</small></td>
                                 
-                                <!-- DTI Column -->
-                                <td>
-                                    <strong>{{ "{:.1f}".format(prop['dti_ratio']) }}%</strong>
-                                </td>
+                                <td><strong>{{ "{:.1f}".format(prop['dti_ratio']) }}%</strong></td>
+                                <td style="color: var(--text-muted);">{{ "{:.1f}".format(prop['years_to_pay_off']) }} Years</td>
 
-                                <!-- Years to Pay Off Column -->
-                                <td style="color: var(--text-muted);">
-                                    {{ "{:.1f}".format(prop['years_to_pay_off']) }} Years
-                                </td>
-
-                                <!-- Status Column -->
                                 <td>
-                                    {% if prop['dti_ratio'] <= 30 %}
-                                        <span class="safe">✅ Safe</span>
-                                    {% elif prop['dti_ratio'] <= 40 %}
-                                        <span class="warning">⚠️ Caution</span>
-                                    {% else %}
-                                        <span class="danger">🚫 Risky</span>
-                                    {% endif %}
+                                    {% if prop['dti_ratio'] <= 30 %}<span class="safe">✅ Safe</span>
+                                    {% elif prop['dti_ratio'] <= 40 %}<span class="warning">⚠️ Caution</span>
+                                    {% else %}<span class="danger">🚫 Risky</span>{% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
@@ -163,21 +118,68 @@
             </div>
             
             <p style="margin-top: 20px; color: var(--text-muted); font-size: 0.9em; text-align: center;">
-                * <strong>Safe:</strong> DTI under 30%. <strong>Caution:</strong> 30-40%. <strong>Risky:</strong> over 40% (High risk of loan rejection).
+                * <strong>Safe:</strong> DTI under 30%. <strong>Caution:</strong> 30-40%. <strong>Risky:</strong> over 40%.
             </p>
 
-        {% elif monthly_income > 0 %}
-            <!-- No Results State -->
+        {% elif error_message %}
             <div class="no-result">
                 <div style="font-size: 3em; margin-bottom: 15px;">📉</div>
-                <h3 style="margin: 0; color: var(--text-main);">No suitable properties found</h3>
-                <p style="margin-top: 10px;">
-                    We couldn't find any properties within your budget (Max DTI 60%).<br>
+                <h3 style="margin: 0; color: var(--danger-text);">{{ error_message }}</h3>
+                <p style="margin-top: 10px; color: var(--text-muted);">
                     Try increasing your <strong>Down Payment</strong> or extending the <strong>Loan Term</strong>.
                 </p>
             </div>
         {% endif %}
     </div>
 
+    <!-- Scripts -->
+    <script>
+        // Dark Mode Logic
+        const toggleBtn = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggleBtn.textContent = '☀️';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            toggleBtn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // CSV Export Logic (New)
+        function exportTableToCSV(filename) {
+            const csv = [];
+            const rows = document.querySelectorAll("#resultTable tr");
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = [], cols = rows[i].querySelectorAll("td, th");
+                
+                for (let j = 0; j < cols.length; j++) {
+                    // Lấy text content và làm sạch (xóa xuống dòng thừa, dấu phẩy nếu cần)
+                    let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/,/g, ""); 
+                    // Xử lý riêng cho cột Location (có thẻ br) nếu cần
+                    row.push(data);
+                }
+                csv.push(row.join(","));        
+            }
+
+            // Download CSV file
+            downloadCSV(csv.join("\n"), filename);
+        }
+
+        function downloadCSV(csv, filename) {
+            const csvFile = new Blob([csv], {type: "text/csv"});
+            const downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        }
+    </script>
 </body>
 </html>

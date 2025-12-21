@@ -1,4 +1,5 @@
 :root {
+    /* --- LIGHT MODE VARIABLES (Default) --- */
     --primary: #2563eb;      /* Xanh dương hiện đại */
     --primary-hover: #1d4ed8;
     --bg-body: #f1f5f9;      /* Xám rất nhạt */
@@ -9,6 +10,42 @@
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     --accent-price: #db2777; /* Hồng đậm cho giá */
+    
+    /* Status Colors (Light) */
+    --safe-bg: #e6f9e9; --safe-text: #28a745;
+    --warn-bg: #fff8e1; --warn-text: #ffc107;
+    --danger-bg: #ffebee; --danger-text: #dc3545;
+    
+    /* Amenities (Light) */
+    --badge-bg: #f1f5f9; --badge-text: #94a3b8;
+    --mrt-bg: #dbeafe; --mrt-text: #1e40af;
+    --school-bg: #fce7f3; --school-text: #9d174d;
+    --park-bg: #dcfce7; --park-text: #166534;
+}
+
+/* --- DARK MODE VARIABLES --- */
+body.dark-mode {
+    --primary: #3b82f6;      /* Xanh dương sáng hơn chút cho dark mode */
+    --primary-hover: #60a5fa;
+    --bg-body: #0f172a;      /* Xanh đen đậm */
+    --bg-card: #1e293b;      /* Xanh đen nhạt hơn */
+    --text-main: #f1f5f9;    /* Trắng xám */
+    --text-muted: #94a3b8;   /* Xám sáng */
+    --border: #334155;       /* Viền xám tối */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+    --accent-price: #f472b6; /* Hồng sáng hơn */
+
+    /* Status Colors (Dark) */
+    --safe-bg: #052e16; --safe-text: #4ade80;
+    --warn-bg: #422006; --warn-text: #facc15;
+    --danger-bg: #450a0a; --danger-text: #f87171;
+
+    /* Amenities (Dark) */
+    --badge-bg: #334155; --badge-text: #64748b;
+    --mrt-bg: #172554; --mrt-text: #93c5fd;
+    --school-bg: #500724; --school-text: #f472b6;
+    --park-bg: #052e16; --park-text: #86efac;
 }
 
 /* --- RESET & BASE --- */
@@ -19,15 +56,17 @@ body {
     color: var(--text-main);
     margin: 0;
     line-height: 1.5;
+    transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu mượt */
 }
 
-h1 { 
+h1, h2, h3 { 
     color: var(--text-main); 
     font-weight: 700; 
     margin: 0; 
-    font-size: 1.8rem;
     letter-spacing: -0.025em;
 }
+h1 { font-size: 1.8rem; margin-bottom: 5px; }
+h2 { margin-top: 30px; }
 
 a { text-decoration: none; color: inherit; transition: color 0.2s; }
 
@@ -71,62 +110,91 @@ a { text-decoration: none; color: inherit; transition: color 0.2s; }
 .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 .btn:active { transform: translateY(0); }
 
-.btn-filter { background-color: var(--primary); color: white; }
+.btn-filter {
+  background-color: var(--primary);
+  color: white;
+  /* box-shadow: var(--shadow-md); */
+}
 .btn-filter:hover { background-color: var(--primary-hover); }
 
 .btn-reset { 
-    background-color: white; 
-    color: var(--text-muted); 
+    background-color: var(--bg-card); /* Thay đổi để thích ứng dark mode */
+    color: var(--text-muted);
     border-color: var(--border); 
 }
-.btn-reset:hover { background-color: #f8fafc; color: var(--text-main); }
+.btn-reset:hover { 
+    background-color: var(--bg-body); /* Thay đổi */
+    color: var(--text-main); 
+}
 
 .btn-suggest { 
-    background-color: #7c3aed; /* Tím */
+    background-color: #7c3aed; 
     color: white; 
-    box-shadow: var(--shadow-md);
+    /* box-shadow: var(--shadow-md); */
 }
 .btn-suggest:hover { background-color: #6d28d9; }
 
 .btn-submit { background-color: var(--primary); color: white; width: 100%; font-size: 1.1em; }
 
+/* Theme Toggle Button (Mới) */
+.btn-theme {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    /* box-shadow: var(--shadow-md); */
+    /* border: 1px solid var(--border); */
+    /* width: 36px; */
+    /* height: 36px; */
+    /* padding: 0; */
+    /* border-radius: 50%; */
+    /* display: inline-flex; */
+    /* align-items: center; */
+    /* justify-content: center; */
+    font-size: 1.2em;
+    /* cursor: pointer; */
+    /* margin-left: 10px; */
+}
+.btn-theme:hover { background-color: var(--bg-body); }
+
 /* --- BACK BUTTON (NEW) --- */
 .btn-back {
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* Khoảng cách giữa mũi tên và chữ */
+    gap: 8px; 
     padding: 10px 24px;
-    background-color: white;
-    color: #495057;
-    border: 1px solid #ced4da;
-    border-radius: 50px; /* Bo tròn hoàn toàn */
+    background-color: var(--bg-card); /* Thay đổi */
+    color: var(--text-muted); /* Thay đổi */
+    border: 1px solid var(--border);
+    border-radius: 50px; 
     text-decoration: none;
     font-weight: 600;
     font-size: 0.95em;
     transition: all 0.2s ease-in-out;
     margin-bottom: 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-back:hover {
-    background-color: #fff;
-    color: #007bff;
-    border-color: #007bff;
-    transform: translateX(-5px); /* Hiệu ứng trượt sang trái */
-    box-shadow: 0 4px 8px rgba(0,123,255,0.15);
+    background-color: var(--bg-card);
+    color: var(--primary);
+    border-color: var(--primary);
+    transform: translateX(-5px); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* General shadow */
 }
 
 /* --- FILTER BAR --- */
-.filter-bar {
+.filter-bar, .form-container, .calculator-card, .form-card {
     background-color: var(--bg-card); 
     padding: 20px; 
     border-radius: 12px;
     box-shadow: var(--shadow-sm); 
     margin-bottom: 25px;
     border: 1px solid var(--border);
+}
+
+.filter-bar {
     display: flex; 
     gap: 15px; 
-    align-items: flex-end; /* Căn đáy để nút và input thẳng hàng */
+    align-items: flex-end; 
     flex-wrap: wrap;
 }
 
@@ -149,9 +217,10 @@ select, input {
     border-radius: 8px; 
     outline: none;
     font-size: 0.95em;
-    background-color: #fff;
+    background-color: var(--bg-card); /* Thay đổi */
+    color: var(--text-main); /* Thay đổi */
     transition: border-color 0.2s, box-shadow 0.2s;
-    min-width: 150px; /* Đây là nguyên nhân gây lỗi, nhưng ta sẽ override ở dưới */
+    min-width: 150px; 
     box-sizing: border-box;
 }
 select:focus, input:focus { 
@@ -174,7 +243,7 @@ select:focus, input:focus {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
-    overflow: hidden; /* Để bo góc table */
+    overflow: hidden; 
 }
 
 .table-container {
@@ -194,7 +263,7 @@ th, td {
 }
 
 th { 
-    background-color: #f8fafc; 
+    background-color: var(--bg-body); /* Thay đổi: dùng bg-body để phân biệt header */
     color: var(--text-muted); 
     font-weight: 600; 
     font-size: 0.85em;
@@ -212,7 +281,7 @@ th a {
 th a:hover, th a.active { color: var(--primary); }
 
 tr:last-child td { border-bottom: none; }
-tr:hover { background-color: #f8fafc; }
+tr:hover { background-color: var(--bg-body); } /* Hiệu ứng hover cho dòng */
 
 /* Table Columns Styling */
 .col-id { color: var(--text-muted); font-family: monospace; }
@@ -236,23 +305,58 @@ tr:hover { background-color: #f8fafc; }
     font-size: 0.75em;
     font-weight: 600;
     margin-right: 4px;
-    background-color: #f1f5f9;
-    color: #94a3b8; /* Mặc định là xám (ẩn) */
+    background-color: var(--badge-bg); /* Biến CSS */
+    color: var(--badge-text); /* Biến CSS */
     opacity: 0.5;
 }
 
-.amenity-badge.active {
-    opacity: 1;
+.amenity-badge.active { opacity: 1; }
+.amenity-badge.mrt.active { background-color: var(--mrt-bg); color: var(--mrt-text); }
+.amenity-badge.school.active { background-color: var(--school-bg); color: var(--school-text); }
+.amenity-badge.park.active { background-color: var(--park-bg); color: var(--park-text); }
+
+/* Badges for Layout & Material */
+.layout-badge { 
+    font-family: 'Inter', sans-serif; 
+    font-size: 0.85em; 
+    color: var(--text-muted); 
+    background: var(--bg-body); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    display: inline-block;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+}
+.mat-badge { font-size: 0.85em; color: var(--text-muted); font-style: italic; }
+.parking-badge { 
+    font-size: 0.85em; 
+    color: var(--safe-text); 
+    background: var(--safe-bg); 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    display: inline-block; margin-top: 4px; 
 }
 
-.amenity-badge.mrt.active { background-color: #dbeafe; color: #1e40af; } /* Xanh dương */
-.amenity-badge.school.active { background-color: #fce7f3; color: #9d174d; } /* Hồng */
-.amenity-badge.park.active { background-color: #dcfce7; color: #166534; } /* Xanh lá */
+/* Action Buttons */
+.action-cell { display: flex; gap: 4px; }
+.action-btn { 
+    width: 28px; height: 28px; 
+    font-size: 1em; 
+    display: flex; align-items: center; justify-content: center; 
+    border: none; background: transparent; 
+    cursor: pointer; transition: 0.2s; 
+    border-radius: 4px; text-decoration: none; 
+}
+.action-btn:hover { background-color: var(--bg-body); }
+.btn-delete { color: var(--danger-text); }
+.btn-delete:hover { background-color: var(--danger-bg); }
+.btn-edit { color: var(--primary); }
+.btn-edit:hover { background-color: var(--bg-body); color: var(--primary-hover); }
 
-/* Status Labels */
-.safe { color: #28a745; font-weight: bold; background: #e6f9e9; padding: 2px 6px; border-radius: 4px; } 
-.warning { color: #ffc107; font-weight: bold; background: #fff8e1; padding: 2px 6px; border-radius: 4px; } 
-.danger { color: #dc3545; font-weight: bold; background: #ffebee; padding: 2px 6px; border-radius: 4px; }
+/* Status Labels (Financial) */
+.safe { color: var(--safe-text); font-weight: bold; background: var(--safe-bg); padding: 2px 6px; border-radius: 4px; } 
+.warning { color: var(--warn-text); font-weight: bold; background: var(--warn-bg); padding: 2px 6px; border-radius: 4px; } 
+.danger { color: var(--danger-text); font-weight: bold; background: var(--danger-bg); padding: 2px 6px; border-radius: 4px; }
 
 /* --- PAGINATION --- */
 .pagination-container {
@@ -267,11 +371,11 @@ tr:hover { background-color: #f8fafc; }
 
 .btn-page {
     display: inline-flex; justify-content: center; align-items: center;
-    width: 40px; height: 40px; 
+    width: 36px; height: 36px; /* Giảm kích thước để bằng nút bên cạnh nếu cần */
     border: 1px solid var(--border); 
-    background-color: white;
+    background-color: var(--bg-card);
     color: var(--text-main); 
-    border-radius: 8px; 
+    border-radius: 4px; /* Bo góc nhẹ để trông vuông vắn hơn */
     font-weight: 500;
     font-size: 0.9em;
     transition: all 0.2s;
@@ -283,33 +387,53 @@ tr:hover { background-color: #f8fafc; }
     border-color: var(--primary); 
     box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
 }
+.dots { display: inline-flex; justify-content: center; align-items: center; width: 30px; color: var(--text-muted); }
 
 .quick-jump { 
     display: flex; align-items: center; gap: 10px; 
-    background: white; padding: 5px 10px; border-radius: 50px;
+    background: var(--bg-card); padding: 5px 10px; border-radius: 50px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
     font-size: 0.9em;
+    color: var(--text-muted);
 }
 
 .quick-jump input { 
     border: none; 
     background: transparent; 
     padding: 5px; 
-    width: 50px;       /* FIX: Đặt chiều rộng nhỏ cho ô nhập số trang */
-    min-width: 0;      /* FIX: Ghi đè min-width 150px từ global rule */
+    width: 50px;       
+    min-width: 0;      
     text-align: center; 
     font-weight: bold; 
+    color: var(--text-main);
 }
 
-.quick-jump input:focus { box-shadow: none; border: none; } /* Xóa viền focus mặc định */
+.quick-jump input:focus { box-shadow: none; border: none; } 
 
 .btn-go { 
-    background: var(--text-main); color: white; 
+    background: var(--text-main); color: var(--bg-card); 
     border: none; border-radius: 20px; 
     padding: 6px 15px; font-size: 0.85em; cursor: pointer; 
 }
-.btn-go:hover { background: black; }
+.btn-go:hover { opacity: 0.9; }
+
+/* --- FORM SPECIFIC --- */
+.form-card { padding: 40px; border-radius: 16px; margin: 40px auto; max-width: 800px; }
+.form-header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+.form-section-title {
+    font-size: 0.85em; font-weight: 700; color: var(--primary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 20px; margin-top: 30px;
+    border-bottom: 2px solid var(--border); padding-bottom: 8px;
+}
+.form-group label { color: var(--text-main); }
+.checkbox-container {
+    background: var(--bg-body); /* Darker than card */
+    border: 1px solid var(--border);
+    padding: 12px; border-radius: 8px; height: 45px; display: flex; align-items: center;
+}
+.checkbox-container span { color: var(--text-main); }
 
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
