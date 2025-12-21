@@ -1,3 +1,4 @@
+/* Dark Mode Support for Form */
 body.dark-mode .form-card {
   background-color: var(--bg-card);
   border-color: var(--border);
@@ -26,7 +27,6 @@ body.dark-mode .checkbox-container span { color: var(--text-main); }
   margin-bottom: 30px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Add space for theme toggle */
   gap: 15px;
 }
 .form-title-group { display: flex; align-items: center; gap: 15px; }
@@ -112,6 +112,13 @@ body.dark-mode .checkbox-container span { color: var(--text-main); }
   font-size: 1em;
   color: var(--text-main);
   font-weight: 500;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .balcony { 

@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <div class="container">
         <!-- HEADER -->
         <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
@@ -132,24 +131,8 @@
         {% endif %}
     </div>
 
-    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        // Dark Mode Logic
-        const toggleBtn = document.getElementById('theme-toggle');
-        const currentTheme = localStorage.getItem('theme');
-
-        if (currentTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            toggleBtn.textContent = '☀️';
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            toggleBtn.textContent = isDark ? '☀️' : '🌙';
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        });
-
         // CSV Export Logic (New)
         function exportTableToCSV(filename) {
             const csv = [];
