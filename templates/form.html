@@ -5,106 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ 'Edit' if property else 'Add' }} Property</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .form-card {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border);
-            max-width: 800px;
-            margin: 40px auto;
-        }
-        .form-header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .form-header h1 { font-size: 1.8rem; margin: 0; color: var(--text-main); }
-        .form-icon { font-size: 2rem; }
-        
-        .form-section-title {
-            font-size: 0.85em;
-            font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 20px;
-            margin-top: 30px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 8px;
-        }
-        
-        .form-row { display: flex; gap: 25px; margin-bottom: 20px; }
-        .form-col { flex: 1; }
-        
-        .form-group { margin-bottom: 5px; }
-        .form-group label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-            font-size: 0.9em; 
-            color: var(--text-main); 
-        }
-        .form-group input, .form-group select { 
-            width: 100%; 
-            box-sizing: border-box; 
-            padding: 12px; 
-            border: 1px solid var(--border); 
-            border-radius: 8px; 
-            font-size: 1em;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .form-group input:focus, .form-group select:focus { 
-            border-color: var(--primary); 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .form-actions { 
-            display: flex; 
-            gap: 15px; 
-            margin-top: 50px; 
-            padding-top: 25px; 
-            border-top: 1px solid var(--border); 
-        }
-        
-        /* Updated Checkbox styling for vertical alignment */
-        .checkbox-wrapper { 
-            display: flex; 
-            flex-direction: column; /* Stack label and input vertically */
-            gap: 8px; 
-            margin-bottom: 5px;
-        }
-        
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            background: #f8fafc;
-            padding: 12px; /* Match input padding */
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            height: 50px; /* Match approximate input height */
-            box-sizing: border-box;
-        }
-
-        .checkbox-container input { 
-            width: 18px; 
-            height: 18px; 
-            margin: 0 10px 0 0; 
-            cursor: pointer; 
-            accent-color: var(--primary); 
-        }
-        
-        .checkbox-container span {
-            font-size: 1em;
-            color: var(--text-main);
-        }
-    </style>
 </head>
 <body>
 
@@ -113,8 +15,12 @@
 
         <div class="form-card">
             <div class="form-header">
-                <span class="form-icon">{{ '✏️' if property else '✨' }}</span>
-                <h1>{{ 'Edit Property Details' if property else 'Add New Property' }}</h1>
+                <div class="form-title-group">
+                    <span class="form-icon">{{ '✏️' if property else '✨' }}</span>
+                    <h1>{{ 'Edit Property Details' if property else 'Add New Property' }}</h1>
+                </div>
+                <!-- Dark Mode Toggle -->
+                <button id="theme-toggle" class="btn btn-theme" title="Toggle Dark Mode">🌙</button>
             </div>
 
             <form method="POST">
@@ -211,10 +117,10 @@
                         </div>
                     </div>
                     
-                    <!-- Balcony field updated to match other fields (Label top, Input bottom) -->
-                    <div class="form-col form-group">
-                        <label>Has Balcony?</label> <!-- Label ở trên -->
-                        <div class="checkbox-container"> <!-- Input ở dưới trong khung -->
+                    <!-- Balcony field updated (Label top, Input bottom) -->
+                    <div class="form-col checkbox-wrapper">
+                        <label class="balcony">Has Balcony?</label> 
+                        <div class="checkbox-container"> 
                             <input type="checkbox" name="balcony" id="balcony" {% if property and property['balcony'] %}checked{% endif %}>
                         </div>
                     </div>
@@ -278,5 +184,22 @@
         </div>
     </div>
 
+    <!-- Theme Toggle Script -->
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggleBtn.textContent = '☀️';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            toggleBtn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    </script>
 </body>
 </html>

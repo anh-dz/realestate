@@ -1,5 +1,5 @@
 .calculator-card {
-  background: white;
+  background: var(--bg-card);
   padding: 30px;
   border-radius: 12px;
   box-shadow: var(--shadow-md);
@@ -30,7 +30,7 @@
   text-align: center;
   padding: 50px;
   color: var(--text-muted);
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
   border: 1px dashed var(--border);

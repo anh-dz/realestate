@@ -370,8 +370,8 @@ tr:hover { background-color: var(--bg-body); } /* Hiệu ứng hover cho dòng *
 .pagination-pages { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 
 .btn-page {
-    display: inline-flex; justify-content: center; align-items: center;
-    width: 36px; height: 36px; /* Giảm kích thước để bằng nút bên cạnh nếu cần */
+    display: inline-flex; justify-content: center; align-items: center; 
+    padding: 5px;
     border: 1px solid var(--border); 
     background-color: var(--bg-card);
     color: var(--text-main); 
