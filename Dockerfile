@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "python db_import.py && python app.py"]
+CMD ["sh", "-c", "python db_init.py && python app.py"]
