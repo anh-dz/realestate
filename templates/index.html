@@ -82,7 +82,7 @@
                                 <td>{{ "{:,.0f}".format(prop['price_per_sqm']) }}</td>
                                 <td class="col-price">{{ "{:,.0f}".format(prop['price'] / 10000) }} <small style="color:var(--text-muted); font-weight:400">万</small></td>
                                 <td style="color:var(--text-muted); font-size:0.9em">{{ prop['transaction_date'] }}</td>
-                                <td class="action-cell">
+                                <td>
                                     <a href="{{ url_for('edit', id=prop['property_id']) }}" class="action-btn btn-edit" title="Edit">✏️</a>
                                     <form action="{{ url_for('delete', id=prop['property_id']) }}" method="POST" onsubmit="return confirm('Delete ID #{{ prop['property_id'] }}?');" style="margin: 0;"><button type="submit" class="action-btn btn-delete" title="Delete">🗑</button></form>
                                 </td>
