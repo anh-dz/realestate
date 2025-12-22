@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mortgage Calculator & Suggestions</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='suggest.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/suggest.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- HEADER -->
         <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <a href="/" class="btn-back"><span>←</span> Back to Home</a>
@@ -20,14 +19,11 @@
                 </p>
             </div>
             
-            <!-- Dark Mode Toggle Button -->
             <button id="theme-toggle" class="btn btn-theme" title="Toggle Dark Mode">🌙</button>
         </div>
         
-        <!-- CALCULATOR FORM -->
         <div class="calculator-card">
             <form method="POST">
-                <!-- Section 1 -->
                 <div class="section-title">1. Your Financials</div>
                 <div class="input-group">
                     <div class="input-item">
@@ -40,7 +36,6 @@
                     </div>
                 </div>
 
-                <!-- Section 2 -->
                 <div class="section-title" style="margin-top: 20px;">2. Loan & Property Preferences</div>
                 <div class="input-group">
                     <div class="input-item">
@@ -63,14 +58,12 @@
             </form>
         </div>
 
-        <!-- RESULTS SECTION -->
         {% if suggestions %}
             <div class="result-header">
                 <div>
                     <h2>📊 Analysis Results</h2>
                     <span class="record-count">Found <strong>{{ suggestions|length }}</strong> suitable properties</span>
                 </div>
-                <!-- Export CSV Button (New) -->
                 <button onclick="exportTableToCSV('suggestion_results.csv')" class="btn btn-filter" style="background-color: #10b981;">
                     📥 Export CSV
                 </button>
@@ -125,7 +118,7 @@
                 <div style="font-size: 3em; margin-bottom: 15px;">📉</div>
                 <h3 style="margin: 0; color: var(--danger-text);">{{ error_message }}</h3>
                 <p style="margin-top: 10px; color: var(--text-muted);">
-                    Try increasing your <strong>Down Payment</strong> or extending the <strong>Loan Term</strong>.
+                    Please get a new job that pays you more money, or consider living in another city.
                 </p>
             </div>
         {% endif %}
@@ -133,7 +126,6 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        // CSV Export Logic (New)
         function exportTableToCSV(filename) {
             const csv = [];
             const rows = document.querySelectorAll("#resultTable tr");
@@ -142,15 +134,12 @@
                 const row = [], cols = rows[i].querySelectorAll("td, th");
                 
                 for (let j = 0; j < cols.length; j++) {
-                    // Lấy text content và làm sạch (xóa xuống dòng thừa, dấu phẩy nếu cần)
                     let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/,/g, ""); 
-                    // Xử lý riêng cho cột Location (có thẻ br) nếu cần
                     row.push(data);
                 }
                 csv.push(row.join(","));        
             }
 
-            // Download CSV file
             downloadCSV(csv.join("\n"), filename);
         }
 

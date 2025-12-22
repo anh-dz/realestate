@@ -4,7 +4,6 @@ import datetime
 
 app = Flask(__name__)
 
-# ... (Hàm generate_page_range, format_date giữ nguyên) ...
 def generate_page_range(current_page, total_pages):
     if total_pages <= 7: return range(1, total_pages + 1)
     pages = {1, total_pages} 
@@ -80,7 +79,6 @@ def index():
 
 @app.route('/suggest', methods=['GET', 'POST'])
 def suggest():
-    # ... (Hàm suggest giữ nguyên như cũ) ...
     conn = get_db_connection()
     suggestions = []
     monthly_income = 0; down_payment = 0; desired_size = 100; interest_rate = 2.1; loan_term = 30
@@ -186,22 +184,18 @@ def add():
             conn.rollback()
             print(f"Error adding property: {e}")
     
-    # Lấy dữ liệu cho dropdown
     districts = conn.execute("SELECT * FROM District").fetchall()
     
-    # Sort Building Type: Other cuối
     building_types = conn.execute("""
         SELECT DISTINCT building_type FROM Building WHERE building_type IS NOT NULL 
         ORDER BY CASE WHEN building_type IN ('Other', 'Others', 'Warehouse', 'Factory') THEN 2 ELSE 1 END, building_type ASC
     """).fetchall()
     
-    # Sort Materials: Other cuối
     materials = conn.execute("""
         SELECT DISTINCT building_materials FROM Building WHERE building_materials IS NOT NULL 
         ORDER BY CASE WHEN building_materials IN ('Other', 'See other registration items') THEN 2 ELSE 1 END, building_materials ASC
     """).fetchall()
     
-    # Sort Parking: Other cuối
     parking_types = conn.execute("""
         SELECT DISTINCT parking_type FROM Parking WHERE parking_type IS NOT NULL AND parking_type != 'nan'
         ORDER BY CASE WHEN parking_type IN ('Other', 'Others') THEN 2 ELSE 1 END, parking_type ASC
@@ -267,7 +261,6 @@ def edit(id):
     if property_data and property_data.get('transaction_date'):
         property_data['transaction_date'] = format_date_for_input(str(property_data['transaction_date']))
     
-    # Lấy dữ liệu dropdown
     districts = conn.execute("SELECT * FROM District").fetchall()
     building_types = conn.execute("""
         SELECT DISTINCT building_type FROM Building WHERE building_type IS NOT NULL 

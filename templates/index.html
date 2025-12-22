@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taipei Real Estate Analytics</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .parking-badge { font-size: 0.85em; color: #059669; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; }
@@ -32,24 +32,20 @@
 <body>
 
     <div class="container">
-        <!-- HEADER -->
         <div class="header-container">
             <div>
                 <h1>Taipei Real Estate Analytics</h1>
-                <span class="record-count">Found <strong>{{ "{:,.0f}".format(total_count) }}</strong> properties available</span>
+                <span class="record-count">Found <strong class="red_number">{{ "{:,.0f}".format(total_count) }}</strong> properties available</span>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <a href="{{ url_for('add') }}" class="btn btn-filter" style="background-color: #28a745;">+ Add New</a>
                 <a href="{{ url_for('suggest') }}" class="btn btn-suggest"><span>💰</span> Calculator</a>
                 
-                <!-- Dark Mode Toggle Button -->
                 <button id="theme-toggle" class="btn btn-theme" title="Toggle Dark Mode">🌙</button>
             </div>
         </div>
 
-        <!-- FILTER BAR -->
         <form action="/" method="GET" class="filter-bar">
-            <!-- District -->
             <div class="filter-group">
                 <label>District</label>
                 <select name="district">
@@ -60,7 +56,6 @@
                 </select>
             </div>
 
-            <!-- Building Type -->
             <div class="filter-group">
                 <label>Type</label>
                 <select name="building_type">
@@ -71,7 +66,6 @@
                 </select>
             </div>
 
-            <!-- Material -->
             <div class="filter-group">
                 <label>Material</label>
                 <select name="material" style="min-width: 130px;">
@@ -84,7 +78,6 @@
                 </select>
             </div>
 
-            <!-- Parking -->
             <div class="filter-group">
                 <label>Parking</label>
                 <select name="parking" style="min-width: 130px;">
@@ -98,7 +91,6 @@
                 </select>
             </div>
 
-            <!-- Balcony -->
             <div class="filter-group">
                 <label>Balcony</label>
                 <select name="balcony" style="min-width: 100px;">
@@ -108,21 +100,21 @@
                 </select>
             </div>
 
-            <!-- Price -->
             <div class="filter-group">
-                <label>Price Range (per m²)</label>
+                <label>Price Per M2</label>
                 <div class="price-inputs">
                     <input type="number" name="min_price" placeholder="Min" value="{{ min_price if min_price }}">
                     <span class="price-separator">-</span>
                     <input type="number" name="max_price" placeholder="Max" value="{{ max_price if max_price }}">
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-filter">Apply</button>
-            <button class="btn btn-reset"><a href="/">Reset</a></button>
+            
+            <div>
+                <button type="submit" class="btn btn-filter">Apply</button>
+                <button class="btn btn-reset"><a href="/">Reset</a></button>
+            </div>
         </form>
 
-        <!-- DATA TABLE -->
         <div class="table-wrapper">
             <div class="table-container">
                 <table>
@@ -191,7 +183,6 @@
             </div>
         </div>
 
-        <!-- PAGINATION -->
         <div class="pagination-container">
             <div class="pagination-pages">
                 {% if page > 1 %}<a href="{{ url_for('index', page=page-1, district=selected_district, building_type=selected_type, material=selected_material, parking=selected_parking, balcony=selected_balcony, min_price=min_price, max_price=max_price, sort_by=sort_by, order=order) }}" class="btn-page">←</a>{% endif %}

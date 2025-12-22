@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ 'Edit' if property else 'Add' }} Property</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -25,7 +25,6 @@
 
             <form method="POST">
                 
-                <!-- 1. LOCATION & BASIC INFO -->
                 <div class="form-section-title" style="margin-top: 0;">1. Location & Info</div>
                 
                 <div class="form-row">
@@ -50,7 +49,6 @@
                     </div>
                 </div>
 
-                <!-- 2. BUILDING DETAILS -->
                 <div class="form-section-title">2. Building Specs</div>
                 
                 <div class="form-row">
@@ -94,7 +92,6 @@
                     </div>
                 </div>
 
-                <!-- 3. LAYOUT (ENGLISH) -->
                 <div class="form-section-title">3. Layout Configuration</div>
                 
                 <div class="form-row">
@@ -117,16 +114,14 @@
                         </div>
                     </div>
                     
-                    <!-- Balcony field updated (Label top, Input bottom) -->
                     <div class="form-col checkbox-wrapper">
-                        <label class="balcony">Has Balcony</label> 
+                        <label class="balcony">Has Balcony?</label> 
                         <div class="checkbox-container"> 
                             <input type="checkbox" name="balcony" id="balcony" {% if property and property['balcony'] %}checked{% endif %}>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. PARKING -->
                 <div class="form-section-title">4. Parking Facilities</div>
                 
                 <div class="form-row">
@@ -156,7 +151,6 @@
                     </div>
                 </div>
 
-                <!-- 5. FINANCIALS -->
                 <div class="form-section-title">5. Financials</div>
                 
                 <div class="form-row">
