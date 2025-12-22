@@ -11,4 +11,5 @@ toggleBtn.addEventListener('click', () => {
     const isDark = document.body.classList.contains('dark-mode');
     toggleBtn.textContent = isDark ? '☀️' : '🌙';
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    initChart();
 });

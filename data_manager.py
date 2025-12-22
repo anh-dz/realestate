@@ -4,12 +4,13 @@ import math
 
 def get_db_connection():
     basedir = os.path.abspath(os.path.dirname(__file__))
-    db_path = os.path.join(basedir, 'database.db')
+    db_path = os.path.join(basedir, 'database/database.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
 def get_properties_data(filters, sort_options, pagination):
+    # ... (Giữ nguyên logic get_properties_data cũ) ...
     conn = get_db_connection()
     
     district_id = filters.get('district')
@@ -107,19 +108,40 @@ def get_properties_data(filters, sort_options, pagination):
     districts = conn.execute("SELECT * FROM District ORDER BY district_id").fetchall()
     
     building_types_sql = """
-        SELECT DISTINCT building_type FROM Building WHERE building_type IS NOT NULL 
-        ORDER BY CASE WHEN building_type IN ('Other', 'Others', 'Warehouse', 'Factory') THEN 2 ELSE 1 END, building_type ASC
+        SELECT DISTINCT building_type 
+        FROM Building 
+        WHERE building_type IS NOT NULL 
+        ORDER BY 
+            CASE 
+                WHEN building_type IN ('Other', 'Others', 'Warehouse', 'Factory') THEN 2 
+                ELSE 1 
+            END,
+            building_type ASC
     """
     building_types = conn.execute(building_types_sql).fetchall()
 
     materials = conn.execute("""
-        SELECT DISTINCT building_materials FROM Building WHERE building_materials IS NOT NULL 
-        ORDER BY CASE WHEN building_materials IN ('Other', 'See other registration items') THEN 2 ELSE 1 END, building_materials ASC
+        SELECT DISTINCT building_materials 
+        FROM Building 
+        WHERE building_materials IS NOT NULL 
+        ORDER BY 
+            CASE 
+                WHEN building_materials IN ('Other', 'See other registration items') THEN 2 
+                ELSE 1 
+            END,
+            building_materials ASC
     """).fetchall()
 
     parking_types = conn.execute("""
-        SELECT DISTINCT parking_type FROM Parking WHERE parking_type IS NOT NULL AND parking_type != 'nan' 
-        ORDER BY CASE WHEN parking_type IN ('Other', 'Others') THEN 2 ELSE 1 END, parking_type ASC
+        SELECT DISTINCT parking_type 
+        FROM Parking 
+        WHERE parking_type IS NOT NULL AND parking_type != 'nan' 
+        ORDER BY 
+            CASE 
+                WHEN parking_type IN ('Other', 'Others') THEN 2 
+                ELSE 1 
+            END,
+            parking_type ASC
     """).fetchall()
     
     conn.close()
@@ -134,7 +156,39 @@ def get_properties_data(filters, sort_options, pagination):
         'total_pages': total_pages
     }
 
+# --- CẬP NHẬT HÀM THỐNG KÊ ---
+def get_district_price_stats():
+    conn = get_db_connection()
+    try:
+        # Tính giá trung bình/m2 CHÍNH XÁC theo từng quận
+        # Chỉ nhóm theo district_name và tính AVG(price_per_sqm)
+        query = """
+            SELECT d.district_name, AVG(t.price_per_sqm) as avg_price
+            FROM "Transaction" t
+            JOIN Properties p ON t.property_id = p.property_id
+            JOIN District d ON p.district_id = d.district_id
+            WHERE t.price_per_sqm > 0
+            GROUP BY d.district_name
+            ORDER BY avg_price DESC
+        """
+        stats = conn.execute(query).fetchall()
+        
+        # Format lại dữ liệu
+        labels = [row['district_name'] for row in stats]
+        data = [int(row['avg_price']) for row in stats] # Làm tròn thành số nguyên
+        
+        return {
+            'labels': labels,
+            'data': data
+        }
+    except Exception as e:
+        print(f"Error getting chart stats: {e}")
+        return {'labels': [], 'data': []}
+    finally:
+        conn.close()
+
 def delete_property(property_id):
+    # ... (Giữ nguyên logic xóa) ...
     conn = get_db_connection()
     try:
         conn.execute("PRAGMA foreign_keys = OFF")

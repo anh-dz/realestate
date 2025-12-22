@@ -334,7 +334,6 @@ tr:hover { background-color: var(--bg-body); }
 }
 .action-btn:hover { background-color: var(--bg-body); }
 .btn-delete { color: var(--danger-text); }
-.btn-delete:hover { background-color: var(--danger-bg); }
 .btn-edit { color: var(--primary); }
 .btn-edit:hover { background-color: var(--bg-body); color: var(--primary-hover); }
 

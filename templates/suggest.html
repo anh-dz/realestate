@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mortgage Calculator & Suggestions</title>
+    <title>Calculator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/suggest.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/tp.png') }}">
 </head>
 <body>
     <div class="container">
@@ -125,33 +126,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script>
-        function exportTableToCSV(filename) {
-            const csv = [];
-            const rows = document.querySelectorAll("#resultTable tr");
-            
-            for (let i = 0; i < rows.length; i++) {
-                const row = [], cols = rows[i].querySelectorAll("td, th");
-                
-                for (let j = 0; j < cols.length; j++) {
-                    let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/,/g, ""); 
-                    row.push(data);
-                }
-                csv.push(row.join(","));        
-            }
-
-            downloadCSV(csv.join("\n"), filename);
-        }
-
-        function downloadCSV(csv, filename) {
-            const csvFile = new Blob([csv], {type: "text/csv"});
-            const downloadLink = document.createElement("a");
-            downloadLink.download = filename;
-            downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/export.js') }}"></script>
 </body>
 </html>

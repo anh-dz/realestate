@@ -1,0 +1,84 @@
+.help-card {
+  background: var(--bg-card);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.help-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--border);
+}
+
+.help-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.help-title {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.help-content {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.step-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+.step-item {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  align-items: flex-start;
+}
+
+.step-number {
+  background-color: var(--primary);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9em;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feature-icon {
+  font-size: 1.5rem;
+  background: var(--bg-body);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.note-box {
+  background-color: var(--warn-bg);
+  border-left: 4px solid var(--warn-text);
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 20px;
+  color: var(--text-main);
+  font-size: 0.95em;
+}

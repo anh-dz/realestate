@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taipei Real Estate Analytics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chart.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/tp.png') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -16,7 +19,8 @@
                 <span class="record-count">Found <strong>{{ "{:,.0f}".format(total_count) }}</strong> properties available</span>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="{{ url_for('help_page') }}" class="btn btn-filter" style="background-color: #3b82f6;">📘 Help</a>
+                
+                <a href="{{ url_for('help_page') }}" class="btn btn-filter" style="background-color: #3b82f6;">📘 Help</a> 
                 <a href="{{ url_for('add') }}" class="btn btn-filter" style="background-color: #28a745;">+ Add</a>
                 <a href="{{ url_for('suggest') }}" class="btn btn-suggest">💰 Calculator</a>
                 <button id="theme-toggle" class="btn btn-theme" title="Toggle Dark Mode">🌙</button>
@@ -24,68 +28,12 @@
         </div>
 
         <form action="/" method="GET" class="filter-bar">
-            <div class="filter-group">
-                <label>District</label>
-                <select name="district">
-                    <option value="">All Districts</option>
-                    {% for d in districts %}
-                    <option value="{{ d['district_id'] }}" {% if selected_district|int == d['district_id'] %}selected{% endif %}>{{ d['district_name'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Type</label>
-                <select name="building_type">
-                    <option value="">All Types</option>
-                    {% for b in building_types %}
-                    <option value="{{ b['building_type'] }}" {% if selected_type == b['building_type'] %}selected{% endif %}>{{ b['building_type'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Material</label>
-                <select name="material" style="min-width: 130px;">
-                    <option value="">All Materials</option>
-                    {% for m in materials %}
-                    <option value="{{ m['building_materials'] }}" {% if selected_material == m['building_materials'] %}selected{% endif %}>
-                        {{ m['building_materials'] }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Parking</label>
-                <select name="parking" style="min-width: 130px;">
-                    <option value="">All Options</option>
-                    <option value="None" {% if selected_parking == 'None' %}selected{% endif %}>No Parking</option>
-                    {% for p in parking_types %}
-                    <option value="{{ p['parking_type'] }}" {% if selected_parking == p['parking_type'] %}selected{% endif %}>
-                        {{ p['parking_type'] }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Balcony</label>
-                <select name="balcony" style="min-width: 100px;">
-                    <option value="">All</option>
-                    <option value="yes" {% if selected_balcony == 'yes' %}selected{% endif %}>Yes</option>
-                    <option value="no" {% if selected_balcony == 'no' %}selected{% endif %}>No</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Price Per M2</label>
-                <div class="price-inputs">
-                    <input type="number" name="min_price" placeholder="Min" value="{{ min_price if min_price }}">
-                    <span class="price-separator">-</span>
-                    <input type="number" name="max_price" placeholder="Max" value="{{ max_price if max_price }}">
-                </div>
-            </div>
+            <div class="filter-group"><label>District</label><select name="district"><option value="">All Districts</option>{% for d in districts %}<option value="{{ d['district_id'] }}" {% if selected_district|int == d['district_id'] %}selected{% endif %}>{{ d['district_name'] }}</option>{% endfor %}</select></div>
+            <div class="filter-group"><label>Type</label><select name="building_type"><option value="">All Types</option>{% for b in building_types %}<option value="{{ b['building_type'] }}" {% if selected_type == b['building_type'] %}selected{% endif %}>{{ b['building_type'] }}</option>{% endfor %}</select></div>
+            <div class="filter-group"><label>Material</label><select name="material" style="min-width: 130px;"><option value="">All Materials</option>{% for m in materials %}<option value="{{ m['building_materials'] }}" {% if selected_material == m['building_materials'] %}selected{% endif %}>{{ m['building_materials'] }}</option>{% endfor %}</select></div>
+            <div class="filter-group"><label>Parking</label><select name="parking" style="min-width: 130px;"><option value="">All Options</option><option value="None" {% if selected_parking == 'None' %}selected{% endif %}>No Parking</option>{% for p in parking_types %}<option value="{{ p['parking_type'] }}" {% if selected_parking == p['parking_type'] %}selected{% endif %}>{{ p['parking_type'] }}</option>{% endfor %}</select></div>
+            <div class="filter-group"><label>Balcony</label><select name="balcony" style="min-width: 100px;"><option value="">All</option><option value="yes" {% if selected_balcony == 'yes' %}selected{% endif %}>Yes</option><option value="no" {% if selected_balcony == 'no' %}selected{% endif %}>No</option></select></div>
+            <div class="filter-group"><label>Price Per M2</label><div class="price-inputs"><input type="number" name="min_price" placeholder="Min" value="{{ min_price if min_price }}"><span class="price-separator">-</span><input type="number" name="max_price" placeholder="Max" value="{{ max_price if max_price }}"></div></div>
             <div>
                 <button type="submit" class="btn btn-filter">Apply</button>
                 <button class="btn btn-reset"><a href="/">Reset</a></button>
@@ -128,7 +76,7 @@
                                     <span class="amenity-badge school {{ 'active' if prop['school_500m'] else '' }}" title="School < 500m">🎓</span>
                                     <span class="amenity-badge park {{ 'active' if prop['park_500m'] else '' }}" title="Park < 500m">🌳</span>
                                     <span class="amenity-badge bus {{ 'active' if prop['bus_station_500m'] else '' }}" title="Bus Station < 500m">🚌</span>
-                                    <span class="amenity-badge undesirable {{ 'active' if prop['undesirable_500m'] else '' }}" title="Undesirable Facility < 500m">⚠️</span>
+                                    {% if prop['undesirable_500m'] %}<span class="amenity-badge undesirable active" title="Undesirable Facility < 500m">⚠️</span>{% endif %}
                                 </td>
                                 <td>{% if prop['parking_type'] and prop['parking_type'] != 'nan' %}<span class="parking-badge">{{ prop['parking_type'] }}</span>{% else %}<span style="color:var(--text-muted)">-</span>{% endif %}</td>
                                 <td>{{ "{:,.0f}".format(prop['price_per_sqm']) }}</td>
@@ -170,13 +118,118 @@
                 <input type="number" name="page" min="1" max="{{ total_pages }}" placeholder="#" required><button type="submit" class="btn-go">Go</button>
             </form>
         </div>
-    </div>
 
+        {% if chart_labels and chart_values %}
+        <div class="chart-container">
+            <h2 class="chart-title">📊 Average Property Price by District (TWD/m²)</h2>
+            <div style="position: relative; height: 400px; width: 100%;">
+                <canvas id="districtPriceChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        const toggleBtn = document.getElementById('theme-toggle');
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark') { document.body.classList.add('dark-mode'); toggleBtn.textContent = '☀️'; }
-        toggleBtn.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); toggleBtn.textContent = isDark ? '☀️' : '🌙'; localStorage.setItem('theme', isDark ? 'dark' : 'light'); });
+        let districtPriceChart = null;
+        let chartDataConfig = null;
+
+        function initChart() {
+            {% if chart_labels and chart_values %}
+                const ctx = document.getElementById('districtPriceChart');
+                if (!ctx) return;
+
+                const context2d = ctx.getContext('2d');
+                
+                const style = getComputedStyle(document.body);
+                const primaryColor = style.getPropertyValue('--primary').trim();
+                const textColor = style.getPropertyValue('--text-main').trim();
+                const gridColor = style.getPropertyValue('--border').trim();
+
+                const gradient = context2d.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, primaryColor); 
+                gradient.addColorStop(1, primaryColor + '40'); 
+
+                chartDataConfig = {
+                    labels: {{ chart_labels | tojson }},
+                    datasets: [{
+                        label: 'Avg Price/m²',
+                        data: {{ chart_values | tojson }},
+                        backgroundColor: gradient, 
+                        hoverBackgroundColor: primaryColor,
+                        borderColor: 'transparent',
+                        borderWidth: 0,
+                        borderRadius: 8, 
+                        borderSkipped: false, 
+                        barPercentage: 0.6, 
+                        categoryPercentage: 0.8
+                    }]
+                };
+
+                Chart.defaults.font.family = "'Inter', sans-serif";
+                Chart.defaults.color = textColor;
+
+                if (districtPriceChart) {
+                    districtPriceChart.destroy();
+                }
+
+                districtPriceChart = new Chart(context2d, {
+                    type: 'bar',
+                    data: chartDataConfig,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: gridColor,
+                                    borderDash: [5, 5], 
+                                    drawBorder: false, 
+                                },
+                                ticks: { 
+                                    color: textColor,
+                                    font: { size: 11 },
+                                    padding: 10,
+                                    callback: function(value) { 
+                                        if (value >= 1000000) return (value/1000000).toFixed(1) + 'M';
+                                        if (value >= 1000) return (value/1000).toFixed(0) + 'k';
+                                        return value; 
+                                    } 
+                                },
+                                border: { display: false } 
+                            },
+                            x: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: { color: textColor, font: { size: 12, weight: '500' } },
+                                border: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(30, 41, 59, 0.9)', 
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: false, 
+                                callbacks: {
+                                    title: function(context) { return context[0].label; },
+                                    label: function(context) { return context.parsed.y.toLocaleString() + ' TWD/m²'; }
+                                }
+                            }
+                        }
+                    }
+                });
+            {% endif %}
+        }
+
+        document.addEventListener("DOMContentLoaded", initChart);
     </script>
 </body>
 </html>
