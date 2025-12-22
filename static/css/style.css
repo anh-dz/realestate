@@ -293,13 +293,14 @@ tr:hover { background-color: var(--bg-body); }
     margin-right: 4px;
     background-color: var(--badge-bg);
     color: var(--badge-text);
-    opacity: 0.5;
+    opacity: 0;
 }
 
 .amenity-badge.active { opacity: 1; }
 .amenity-badge.mrt.active { background-color: var(--mrt-bg); color: var(--mrt-text); }
 .amenity-badge.school.active { background-color: var(--school-bg); color: var(--school-text); }
 .amenity-badge.park.active { background-color: var(--park-bg); color: var(--park-text); }
+.amenity-badge.undesirable.active { background-color: var(--school-bg); color: var(--school-text); }
 
 .layout-badge { 
     font-family: 'Inter', sans-serif; 

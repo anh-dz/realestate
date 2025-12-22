@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide - Taipei Real Estate Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .help-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+        
+        .help-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .help-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .help-title {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-content {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background-color: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            background: var(--bg-body);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .note-box {
+            background-color: var(--warn-bg);
+            border-left: 4px solid var(--warn-text);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            color: var(--text-main);
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <a href="/" class="btn-back"><span>←</span> Back to Home</a>
+                <h1 style="font-size: 2rem;">📘 User Guide</h1>
+                <p style="color: var(--text-muted); margin-top: 5px;">
+                    How to use the Taipei Real Estate Analytics Platform effectively.
+                </p>
+            </div>
+            
+            <button id="theme-toggle" class="btn btn-theme" title="Toggle Dark Mode">🌙</button>
+        </div>
+        
+        <div class="help-card">
+            
+            <div class="help-section">
+                <div class="feature-icon">🔍</div>
+                <h2 class="help-title">1. Search & Filter Properties</h2>
+                <div class="help-content">
+                    <p>Easily find properties that match your criteria using the comprehensive filter bar at the top of the home page.</p>
+                    <ul class="step-list">
+                        <li class="step-item">
+                            <span class="step-number">1</span>
+                            <div>
+                                <strong>Select Filters:</strong> Choose specific criteria like <em>District</em> (e.g., Xinyi, Daan), <em>Building Type</em>, <em>Material</em>, <em>Parking</em>, or <em>Balcony</em> availability.
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">2</span>
+                            <div>
+                                <strong>Set Price Range:</strong> Enter a minimum and/or maximum price per square meter (TWD) to narrow down your budget.
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">3</span>
+                            <div>
+                                <strong>Apply:</strong> Click the <span class="btn btn-filter" style="padding: 2px 8px; font-size: 0.8em;">Apply</span> button to update the list.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="feature-icon">📊</div>
+                <h2 class="help-title">2. Viewing Property Details</h2>
+                <div class="help-content">
+                    <p>The main table displays key information for each property. You can sort data by clicking on any column header (e.g., Price, Date, ID).</p>
+                    <ul class="step-list">
+                        <li class="step-item">
+                            <span class="step-number">1</span>
+                            <div>
+                                <strong>Nearby Amenities:</strong> Look for icons in the "Nearby" column to see available facilities within 500m:
+                                <br>
+                                <span class="amenity-badge mrt active">🚇 MRT</span> 
+                                <span class="amenity-badge school active">🎓 School</span> 
+                                <span class="amenity-badge park active">🌳 Park</span>
+                                <span class="amenity-badge bus active">🚌 Bus</span>
+                                <span class="amenity-badge undesirable active">⚠️ Warning</span> (Undesirable facility nearby)
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">2</span>
+                            <div>
+                                <strong>Layout Info:</strong> Check the "Layout" column for the number of Rooms, Halls, and Bathrooms.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="feature-icon">🧮</div>
+                <h2 class="help-title">3. Affordability Calculator</h2>
+                <div class="help-content">
+                    <p>Plan your purchase with our financial tool. Click the <span class="btn btn-suggest" style="padding: 2px 8px; font-size: 0.8em;">💰 Calculator</span> button on the home page.</p>
+                    <ul class="step-list">
+                        <li class="step-item">
+                            <span class="step-number">1</span>
+                            <div>
+                                <strong>Enter Financials:</strong> Input your monthly income and available down payment.
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">2</span>
+                            <div>
+                                <strong>Set Preferences:</strong> Specify desired property size (m²), loan interest rate (%), and loan term (years).
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">3</span>
+                            <div>
+                                <strong>Analyze:</strong> The system will suggest properties you can afford and calculate your Debt-to-Income (DTI) ratio.
+                                <br>
+                                Result Status: 
+                                <span class="safe">✅ Safe</span> (< 30% DTI), 
+                                <span class="warning">⚠️ Caution</span> (30-40%), 
+                                <span class="danger">🚫 Risky</span> (> 40%).
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">4</span>
+                            <div>
+                                <strong>Export Data:</strong> Once finish, an <span style="color: #10b981; font-weight: bold;">📥 Export CSV</span> button will appear, allowing you to download the results for offline analysis.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="feature-icon">⚙️</div>
+                <h2 class="help-title">4. Managing Data</h2>
+                <div class="help-content">
+                    <p>Administrators can update the database directly from the platform.</p>
+                    <ul class="step-list">
+                        <li class="step-item">
+                            <span class="step-number">1</span>
+                            <div>
+                                <strong>Add New:</strong> Click <span class="btn btn-filter" style="padding: 2px 8px; font-size: 0.8em; background-color: #28a745;">+ Add New</span> to create a new property record.
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">2</span>
+                            <div>
+                                <strong>Edit/Delete:</strong> Use the action buttons <span style="color:var(--primary)">✏️</span> (Edit) and <span style="color:var(--danger-text)">🗑</span> (Delete) in the last column of the table to modify or remove specific records.
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="note-box">
+                        <strong>Note:</strong> Deleting a property will also remove all associated transaction and parking data to maintain database integrity.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggleBtn.textContent = '☀️';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            toggleBtn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>

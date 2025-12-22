@@ -12,7 +12,6 @@ def get_db_connection():
 def get_properties_data(filters, sort_options, pagination):
     conn = get_db_connection()
     
-    # 1. Giải nén tham số
     district_id = filters.get('district')
     building_type = filters.get('type')
     min_price = filters.get('min_price')
@@ -28,7 +27,6 @@ def get_properties_data(filters, sort_options, pagination):
     per_page = pagination.get('per_page', 20)
     offset = (page - 1) * per_page
 
-    # 2. Xây dựng mệnh đề WHERE
     where_clause = "WHERE 1=1"
     params = []
 
@@ -59,7 +57,6 @@ def get_properties_data(filters, sort_options, pagination):
         elif has_balcony == 'no':
             where_clause += " AND (b.balcony = 0 OR b.balcony IS NULL)"
 
-    # 3. Đếm tổng số dòng
     count_sql = f"""
         SELECT COUNT(*) 
         FROM Properties p
@@ -72,7 +69,6 @@ def get_properties_data(filters, sort_options, pagination):
     total_count = conn.execute(count_sql, params).fetchone()[0]
     total_pages = math.ceil(total_count / per_page)
 
-    # 4. Xây dựng ORDER BY
     valid_sort = {
         'id': 'p.property_id',
         'district': 'd.district_name',
@@ -87,14 +83,13 @@ def get_properties_data(filters, sort_options, pagination):
     sql_sort = valid_sort.get(sort_by, 'p.property_id')
     sql_order = 'DESC' if order == 'desc' else 'ASC'
 
-    # 5. Query lấy dữ liệu chính
     data_sql = f"""
         SELECT p.property_id, p.address, p.completion_date,
                d.district_name, 
                b.building_type, b.floor_count, b.balcony, 
                b.building_materials, b.room_count, b.hall_count, b.bathroom_count,
                t.price, t.price_per_sqm, t.transaction_date,
-               p.school_500m, p.mrt_station_500m, p.park_500m,
+               p.school_500m, p.mrt_station_500m, p.park_500m, p.bus_station_500m, p.undesirable_500m,
                pk.parking_type, pk.parking_price
         FROM Properties p
         JOIN "Transaction" t ON p.property_id = t.property_id
@@ -109,50 +104,23 @@ def get_properties_data(filters, sort_options, pagination):
     query_params = params + [per_page, offset]
     properties = conn.execute(data_sql, query_params).fetchall()
     
-    # 6. Lấy dữ liệu hỗ trợ cho Dropdown Filter (Đã cập nhật Sort Logic)
     districts = conn.execute("SELECT * FROM District ORDER BY district_id").fetchall()
     
-    # Sort Building Types: Đưa 'Other' xuống cuối
     building_types_sql = """
-        SELECT DISTINCT building_type 
-        FROM Building 
-        WHERE building_type IS NOT NULL 
-        ORDER BY 
-            CASE 
-                WHEN building_type IN ('Other', 'Others', 'Warehouse', 'Factory') THEN 2 
-                ELSE 1 
-            END,
-            building_type ASC
+        SELECT DISTINCT building_type FROM Building WHERE building_type IS NOT NULL 
+        ORDER BY CASE WHEN building_type IN ('Other', 'Others', 'Warehouse', 'Factory') THEN 2 ELSE 1 END, building_type ASC
     """
     building_types = conn.execute(building_types_sql).fetchall()
 
-    # Sort Materials: Đưa 'Other', 'See other registration items' xuống cuối
-    materials_sql = """
-        SELECT DISTINCT building_materials 
-        FROM Building 
-        WHERE building_materials IS NOT NULL 
-        ORDER BY 
-            CASE 
-                WHEN building_materials IN ('Other', 'See other registration items', 'Brick', 'Wood', 'Stone') THEN 2 
-                ELSE 1 
-            END,
-            building_materials ASC
-    """
-    materials = conn.execute(materials_sql).fetchall()
+    materials = conn.execute("""
+        SELECT DISTINCT building_materials FROM Building WHERE building_materials IS NOT NULL 
+        ORDER BY CASE WHEN building_materials IN ('Other', 'See other registration items') THEN 2 ELSE 1 END, building_materials ASC
+    """).fetchall()
 
-    # Sort Parking: Đưa 'Other' xuống cuối
-    parking_types_sql = """
-        SELECT DISTINCT parking_type 
-        FROM Parking 
-        WHERE parking_type IS NOT NULL AND parking_type != 'nan' 
-        ORDER BY 
-            CASE 
-                WHEN parking_type IN ('Other', 'Others') THEN 2 
-                ELSE 1 
-            END,
-            parking_type ASC
-    """
-    parking_types = conn.execute(parking_types_sql).fetchall()
+    parking_types = conn.execute("""
+        SELECT DISTINCT parking_type FROM Parking WHERE parking_type IS NOT NULL AND parking_type != 'nan' 
+        ORDER BY CASE WHEN parking_type IN ('Other', 'Others') THEN 2 ELSE 1 END, parking_type ASC
+    """).fetchall()
     
     conn.close()
     
@@ -174,16 +142,13 @@ def delete_property(property_id):
         conn.execute("DELETE FROM `Transaction` WHERE property_id = ?", (property_id,))
         conn.execute("DELETE FROM Properties WHERE property_id = ?", (property_id,))
         conn.execute("DELETE FROM Building WHERE building_id = ?", (property_id,))
-        
         conn.execute("UPDATE Building SET building_id = building_id - 1 WHERE building_id > ?", (property_id,))
         conn.execute("UPDATE Properties SET property_id = property_id - 1, building_id = building_id - 1 WHERE property_id > ?", (property_id,))
         conn.execute("UPDATE `Transaction` SET property_id = property_id - 1 WHERE property_id > ?", (property_id,))
         conn.execute("UPDATE Parking SET property_id = property_id - 1 WHERE property_id > ?", (property_id,))
-        
         max_id = conn.execute("SELECT MAX(property_id) FROM Properties").fetchone()[0] or 0
         for tbl in ['Properties', 'Building', 'Transaction', 'Parking']:
             conn.execute(f"UPDATE sqlite_sequence SET seq = ? WHERE name = '{tbl}'", (max_id,))
-        
         conn.commit()
     except Exception as e:
         conn.rollback()

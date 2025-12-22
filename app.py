@@ -278,5 +278,9 @@ def edit(id):
     conn.close()
     return render_template('form.html', property=property_data, districts=districts, building_types=building_types, materials=materials, parking_types=parking_types)
 
+@app.route('/help', methods=['GET'])
+def help_page():
+    return render_template('help.html')
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(port=5000, debug=True)
