@@ -6,6 +6,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_NAME = os.path.join(BASE_DIR, 'database/database.db')
 CSV_FILE = os.path.join(BASE_DIR, 'database/taipei_house_prices.csv')
+SCHEMA_FILE = os.path.join(BASE_DIR, 'database/schema.sql')
 
 def parse_floor(text):
     if not isinstance(text, str): return 0
@@ -22,80 +23,33 @@ def parse_address(full_address):
     if match: return match.group(2).strip(), match.group(1)
     return str(full_address), ""
 
+def process_date(date_str):
+    if not isinstance(date_str, str):
+        return None
+    date_str = date_str.replace('-', '/')
+    parts = date_str.split('/')
+    if len(parts) == 3:
+        try:
+            year, month, day = parts
+            return f"{int(year)}/{int(month)}/{int(day)}"
+        except ValueError:
+            return date_str
+    return date_str
+
 def init_db():
-    print(f"⏳ Reading CSV from: {CSV_FILE}")
-    try:
-        df = pd.read_csv(CSV_FILE)
-    except FileNotFoundError:
-        print("❌ LỖI: Không tìm thấy file CSV.")
-        return
+    print(f"Reading CSV file from: {CSV_FILE}")
+    df = pd.read_csv(CSV_FILE)
 
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     
-    # 1. TẠO BẢNG
-    print("🛠 Creating Table...")
-    cursor.executescript('''
-        DROP TABLE IF EXISTS Parking;
-        DROP TABLE IF EXISTS "Transaction";
-        DROP TABLE IF EXISTS Economic;
-        DROP TABLE IF EXISTS Properties;
-        DROP TABLE IF EXISTS Building;
-        DROP TABLE IF EXISTS District;
+    print("Creating database schema...")
+    
+    with open(SCHEMA_FILE, 'r') as f:
+        schema_script = f.read()
+    cursor.executescript(schema_script)
 
-        CREATE TABLE District (district_id INTEGER PRIMARY KEY, district_name TEXT NOT NULL UNIQUE);
-        CREATE TABLE Building (
-            building_id INTEGER PRIMARY KEY,
-            building_type TEXT,
-            room_count INTEGER,
-            hall_count INTEGER,
-            bathroom_count INTEGER,
-            floor_count INTEGER,
-            building_materials TEXT,
-            balcony BOOLEAN
-        );
-        CREATE TABLE Properties (
-            property_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            district_id INTEGER,
-            building_id INTEGER,
-            address TEXT,
-            street TEXT,
-            number TEXT,
-            completion_date DATE,
-            school_500m BOOLEAN,
-            park_500m BOOLEAN,
-            bus_station_500m BOOLEAN,
-            mrt_station_500m BOOLEAN,
-            undesirable_500m BOOLEAN,
-            FOREIGN KEY (district_id) REFERENCES District(district_id),
-            FOREIGN KEY (building_id) REFERENCES Building(building_id)
-        );
-        CREATE TABLE Economic (year INTEGER, quarter INTEGER, mortgage_rate REAL, unemployment_rate REAL, economic_growth_rate REAL, gdp REAL, PRIMARY KEY (year, quarter));
-        CREATE TABLE "Transaction" (
-            transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            property_id INTEGER,
-            transaction_date DATE,
-            price REAL,
-            price_per_sqm REAL,
-            residential_price_index REAL,
-            house_price_to_income REAL,
-            year INTEGER,
-            quarter INTEGER,
-            FOREIGN KEY (property_id) REFERENCES Properties(property_id),
-            FOREIGN KEY (year, quarter) REFERENCES Economic(year, quarter)
-        );
-        CREATE TABLE Parking (
-            parking_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            property_id INTEGER,
-            parking_type TEXT,
-            parking_area_sqm REAL,
-            parking_price REAL,
-            FOREIGN KEY (property_id) REFERENCES Properties(property_id)
-        );
-    ''')
-
-    # 2. IMPORT DỮ LIỆU
-    print("🚀 Import Data...")
+    print("Processing data...")
     
     unique_districts = df['District'].unique()
     district_map = {name: i+1 for i, name in enumerate(unique_districts)}
@@ -114,15 +68,12 @@ def init_db():
     skipped_count = 0
     
     for index, row in df.iterrows():
-        # --- LỌC DỮ LIỆU RÁC ---
-        # Nếu giá tổng hoặc giá đơn vị <= 0 thì bỏ qua
         if row['Total price: yuan'] <= 0 or row['Unit price: yuan per square meter'] <= 0:
             skipped_count += 1
             continue
         
         current_id += 1
         
-        # 1. Building
         floor_int = parse_floor(row['Total number of floors'])
         has_balcony = 1 if row['Balcony area'] > 0 else 0
         buildings.append((
@@ -136,9 +87,10 @@ def init_db():
             has_balcony
         ))
 
-        # 2. Property
         street, number = parse_address(row['Detail Address'])
         dist_id = district_map.get(row['District'])
+        comp_date = process_date(str(row['Construction completion date'])) if pd.notna(row['Construction completion date']) else None
+
         properties.append((
             current_id,
             dist_id,
@@ -146,7 +98,7 @@ def init_db():
             row['Detail Address'],
             street,
             number,
-            row['Construction completion date'],
+            comp_date,
             row['School_within 500'],
             row['Park_within 500'],
             row['Bus stop_within 500'],
@@ -154,11 +106,12 @@ def init_db():
             row['Disgusting facilities_within 500']
         ))
 
-        # 3. Transaction
+        trans_date = process_date(str(row['Transaction date'])) if pd.notna(row['Transaction date']) else None
+
         transactions.append((
             current_id,
             current_id,
-            row['Transaction date'],
+            trans_date,
             row['Total price: yuan'],
             row['Unit price: yuan per square meter'],
             row['Residential Price Index'],
@@ -167,7 +120,6 @@ def init_db():
             row['season']
         ))
 
-        # 4. Parking
         p_type = str(row['Parking space categories'])
         if p_type and p_type.lower() != 'nan' and row['Total price of parking space: yuan'] > 0:
             parkings.append((
@@ -184,8 +136,8 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print(f"✅ Finish! Import {current_id} vaild values")
-    print(f"🗑 Remove {skipped_count} invaild")
+    print(f"Imported {current_id} clean records.")
+    print(f"Skipped {skipped_count} invalid records (Price <= 0).")
 
 if __name__ == '__main__':
     init_db()
