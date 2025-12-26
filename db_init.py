@@ -4,9 +4,9 @@ import re
 import os
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_NAME = os.path.join(BASE_DIR, 'database/database.db')
-CSV_FILE = os.path.join(BASE_DIR, 'database/taipei_house_prices.csv')
-SCHEMA_FILE = os.path.join(BASE_DIR, 'database/schema.sql')
+DB_NAME = os.path.join(BASE_DIR, 'model/database/database.db')
+CSV_FILE = os.path.join(BASE_DIR, 'model/database/taipei_house_prices.csv')
+SCHEMA_FILE = os.path.join(BASE_DIR, 'model/database/schema.sql')
 
 def parse_floor(text):
     if not isinstance(text, str): return 0
