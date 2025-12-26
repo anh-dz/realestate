@@ -1,5 +1,7 @@
 from flask import Flask
+from flask import render_template
 from controller.main_control import index_controller, add_controller, edit_controller, delete_controller, suggest_controller
+
 
 app = Flask(__name__)
 
@@ -25,7 +27,6 @@ def suggest():
 
 @app.route('/help', methods=['GET'])
 def help_page():
-    from flask import render_template
     return render_template('help.html')
 
 if __name__ == '__main__':
